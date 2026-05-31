@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Lectio</title>
+<title>Study Bible</title>
 <meta name="description" content="A beautiful, distraction-free Bible reader">
 <meta name="theme-color" content="#1A1612" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Lectio">
+<meta name="apple-mobile-web-app-title" content="Study Bible">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -438,9 +438,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
       <span class="top-trans-arrow">↓</span>
     </div>
   </div>
-  <div class="top-mid"><span class="top-wordmark top-wordmark-centre">Lectio</span></div>
+  <div class="top-mid"><span class="top-wordmark top-wordmark-centre">Study Bible</span></div>
   <div class="top-right">
-    <span class="top-wordmark top-wordmark-right">Lectio</span>
+    <span class="top-wordmark top-wordmark-right">Study Bible</span>
     <button class="icon-btn" id="planBtn" title="Reading Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></button>
     <button class="icon-btn" id="searchBtn" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
     <button class="icon-btn" id="bookmarksBtn" title="Bookmarks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
@@ -609,8 +609,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.3.0</span></div>
-      <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">May 2026</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.0</span></div>
+      <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
     <div class="modal-sec">
@@ -721,15 +721,15 @@ const POPULAR_ORDER=['NIV','NIV11','NIVUK','NLT','NLT2015','ESV','MSG','NASB','N
 const SECONDARY_ORDER=['NRSV','NRSVUE','RSV','ASV','YLT','DBY','ERV'];
 
 // ═══ PERSISTENCE ════════════════════════════════
-function loadPersisted(){try{return JSON.parse(localStorage.getItem('lectio-state')||'{}');}catch(e){return{};}}
+function loadPersisted(){try{return JSON.parse(localStorage.getItem('study-bible-state')||'{}');}catch(e){return{};}}
 function persist(){
   const k={book:S.book,chapter:S.chapter,translation1:S.translation1,showVerseNums:S.showVerseNums,showChHead:S.showChHead,showDropCap:S.showDropCap,flowingProse:S.flowingProse,theme:S.theme,size:S.size,lineHeight:S.lineHeight,readWidth:S.readWidth,textAlign:S.textAlign,parSpacing:S.parSpacing,font:S.font,letterSpacing:S.letterSpacing,bionicReading:S.bionicReading,dyslexiaFont:S.dyslexiaFont,highContrast:S.highContrast};
-  localStorage.setItem('lectio-state',JSON.stringify(k));
+  localStorage.setItem('study-bible-state',JSON.stringify(k));
 }
-function loadBookmarks(){try{return JSON.parse(localStorage.getItem('lectio-bookmarks')||'[]');}catch(e){return[];}}
-function saveBookmarks(){localStorage.setItem('lectio-bookmarks',JSON.stringify(S.bookmarks));}
-function loadHighlights(){try{return JSON.parse(localStorage.getItem('lectio-highlights')||'{}');}catch(e){return{};}}
-function saveHighlights(){localStorage.setItem('lectio-highlights',JSON.stringify(S.highlights));}
+function loadBookmarks(){try{return JSON.parse(localStorage.getItem('study-bible-bookmarks')||'[]');}catch(e){return[];}}
+function saveBookmarks(){localStorage.setItem('study-bible-bookmarks',JSON.stringify(S.bookmarks));}
+function loadHighlights(){try{return JSON.parse(localStorage.getItem('study-bible-highlights')||'{}');}catch(e){return{};}}
+function saveHighlights(){localStorage.setItem('study-bible-highlights',JSON.stringify(S.highlights));}
 
 // ═══ STATE ══════════════════════════════════════
 const _p=loadPersisted();
@@ -748,9 +748,9 @@ const S={
   bionicReading:_p.bionicReading??false,
   dyslexiaFont:_p.dyslexiaFont??false,
   highContrast:_p.highContrast??false,
-  apiKey:CONFIG.apiBibleKey||localStorage.getItem('lectio-apibible-key')||'',
+  apiKey:CONFIG.apiBibleKey||localStorage.getItem('study-bible-apibible-key')||'',
   apiBibles:[],
-  esvApiKey:CONFIG.esvKey||localStorage.getItem('lectio-esv-key')||'',
+  esvApiKey:CONFIG.esvKey||localStorage.getItem('study-bible-esv-key')||'',
   bookmarks:loadBookmarks(),
   highlights:loadHighlights(),
   selectedVerses:new Set(),
@@ -1225,7 +1225,7 @@ function expandQuery(q){
 }
 
 // Recent searches
-const RECENT_KEY='lectio-recent-searches';
+const RECENT_KEY='study-bible-recent-searches';
 function getRecentSearches(){try{return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]');}catch(e){return[];}}
 function addRecentSearch(q){
   if(!q||q.length<2)return;
@@ -1525,7 +1525,7 @@ function buildPlanChapters(id){
 function getTodaysReading(planId){
   const def=PLAN_DEFS.find(p=>p.id===planId);if(!def)return{day:1,maxDay:1,passages:[],progress:0};
   const chs=buildPlanChapters(planId);
-  const startKey=`lectio-planstart-${planId}`;
+  const startKey=`study-bible-planstart-${planId}`;
   let sd=localStorage.getItem(startKey);
   if(!sd){sd=new Date().toISOString().split('T')[0];localStorage.setItem(startKey,sd);}
   const dayIdx=Math.min(Math.floor((Date.now()-new Date(sd).getTime())/86400000),def.days-1);
@@ -1533,14 +1533,14 @@ function getTodaysReading(planId){
   const end=Math.floor((dayIdx+1)*chs.length/def.days);
   return{day:dayIdx+1,maxDay:def.days,passages:chs.slice(start,end),progress:Math.round((dayIdx+1)/def.days*100)};
 }
-let activePlan=localStorage.getItem('lectio-active-plan')||'sequential';
+let activePlan=localStorage.getItem('study-bible-active-plan')||'sequential';
 function renderPlanContent(planId){
-  activePlan=planId;localStorage.setItem('lectio-active-plan',planId);
+  activePlan=planId;localStorage.setItem('study-bible-active-plan',planId);
   const content=document.getElementById('planContent');
   const r=getTodaysReading(planId);
   content.innerHTML=`<div class="plan-day">Day ${r.day} of ${r.maxDay}</div>${r.passages.map(p=>`<div class="plan-passage" data-book="${esc(p.book)}" data-ch="${p.ch}"><span class="plan-passage-ref">${esc(p.book)} ${p.ch}</span><span class="plan-passage-go">Read →</span></div>`).join('')}<div class="plan-progress"><div class="plan-progress-label">${r.progress}% complete</div><div class="plan-progress-bar"><div class="plan-progress-fill" style="width:${r.progress}%"></div></div></div><div style="margin-top:16px"><button class="open-sec-btn" id="resetPlanBtn" style="font-size:.72rem">Reset plan to today</button></div>`;
   content.querySelectorAll('.plan-passage').forEach(el=>{el.addEventListener('click',()=>{S.book=el.dataset.book;S.chapter=parseInt(el.dataset.ch,10);closeAll();render(true);});});
-  document.getElementById('resetPlanBtn').addEventListener('click',()=>{localStorage.setItem(`lectio-planstart-${planId}`,new Date().toISOString().split('T')[0]);renderPlanContent(planId);});
+  document.getElementById('resetPlanBtn').addEventListener('click',()=>{localStorage.setItem(`study-bible-planstart-${planId}`,new Date().toISOString().split('T')[0]);renderPlanContent(planId);});
 }
 function openPlanModal(){
   const tabs=document.getElementById('planTabs');
@@ -1610,7 +1610,7 @@ async function saveEsvKey(){
   try{
     const r=await fetch('https://api.esv.org/v3/passage/text/?q=John+1%3A1&include-verse-numbers=false&include-short-copyright=false',{headers:{Authorization:`Token ${key}`}});
     if(!r.ok)throw new Error(`Rejected (${r.status})`);
-    S.esvApiKey=key;localStorage.setItem('lectio-esv-key',key);buildSelect();updateCompareBadge();
+    S.esvApiKey=key;localStorage.setItem('study-bible-esv-key',key);buildSelect();updateCompareBadge();
     st.textContent='✓ ESV connected';st.className='key-status ok';
   }catch(err){st.textContent='✗ '+err.message;st.className='key-status err';}
 }
@@ -1621,7 +1621,7 @@ async function saveApiBibleKey(){
   st.textContent='Checking…';st.className='key-status';
   try{
     const bibles=await loadApiBibles(key);
-    S.apiKey=key;S.apiBibles=bibles;localStorage.setItem('lectio-apibible-key',key);buildSelect();updateCompareBadge();
+    S.apiKey=key;S.apiBibles=bibles;localStorage.setItem('study-bible-apibible-key',key);buildSelect();updateCompareBadge();
     st.textContent=`✓ Connected — ${bibles.length} translations`;st.className='key-status ok';
   }catch(err){st.textContent='✗ '+err.message;st.className='key-status err';}
 }
@@ -1781,7 +1781,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   // Auto-load saved keys
   if(S.apiKey){
     try{S.apiBibles=await loadApiBibles(S.apiKey);document.getElementById('apiBibleKeyStatus').textContent=`✓ ${S.apiBibles.length} translations connected`;document.getElementById('apiBibleKeyStatus').className='key-status ok';}
-    catch(e){S.apiKey='';localStorage.removeItem('lectio-apibible-key');document.getElementById('apiBibleKeyStatus').textContent='✗ Saved key failed — please re-enter';document.getElementById('apiBibleKeyStatus').className='key-status err';}
+    catch(e){S.apiKey='';localStorage.removeItem('study-bible-apibible-key');document.getElementById('apiBibleKeyStatus').textContent='✗ Saved key failed — please re-enter';document.getElementById('apiBibleKeyStatus').className='key-status err';}
   }
   if(S.esvApiKey){document.getElementById('esvKeyStatus').textContent='✓ ESV connected';document.getElementById('esvKeyStatus').className='key-status ok';}
 

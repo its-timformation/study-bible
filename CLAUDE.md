@@ -1,6 +1,6 @@
-# Lectio — Bible Reader
+# Study Bible
 
-A single-page PWA Bible reader inspired by the Alabaster Bible aesthetic.
+A single-page PWA Bible reader and study tool inspired by the Alabaster Bible aesthetic.
 Live at your GitHub Pages or Netlify URL.
 
 ## Project structure
@@ -52,7 +52,7 @@ Add a new entry to `PLAN_DEFS` array and handle it in `buildPlanChapters()`.
 Edit `icon.svg`. The apple-touch-icon is generated from Canvas at runtime — update the canvas drawing code in the bootstrap section if you want it to match.
 
 **Bump the service worker cache** (forces all users to get the new version)
-In `sw.js`, change `const CACHE_NAME = 'lectio-v1'` to `lectio-v2` etc.
+In `sw.js`, change `const CACHE_NAME = 'study-bible-v1'` to `study-bible-v2` etc.
 
 ## Deploying updates
 
@@ -95,9 +95,9 @@ Keep the file private if your keys are filled in.
 
 ## Versioning
 
-Lectio uses semantic versioning: `MAJOR.MINOR.PATCH`
+Study Bible uses semantic versioning: `MAJOR.MINOR.PATCH`
 
-Current version: **1.3.0**
+Current version: **1.0.0**
 
 ### Rules
 - **PATCH** — bug fixes, tweaks, small visual changes → bump last number (`1.3.0` → `1.3.1`)
@@ -112,10 +112,7 @@ Two places in `index.html`:
 ### History
 | Version | What changed |
 |---------|-------------|
-| 1.0.0   | Initial build — single HTML file, WEB/KJV translations |
-| 1.1.0   | ESV + API.Bible keys, compare mode, formatting toggles |
-| 1.2.0   | PWA, mobile overhaul, verse actions, bookmarks, highlights |
-| 1.3.0   | Translation pill, compare modal redesign, Cloudflare migration, versioning |
+| 1.0.0   | Study Bible — forked from Lectio 1.3.0 |
 
 ### Always tell the user
 Before handing over an updated file, say:

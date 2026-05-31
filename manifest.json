@@ -1,6 +1,6 @@
 {
-  "name": "Lectio — Bible Reader",
-  "short_name": "Lectio",
+  "name": "Study Bible",
+  "short_name": "Study Bible",
   "description": "A beautiful, distraction-free Bible reader. Inspired by Alabaster.",
   "start_url": "/",
   "display": "standalone",
