@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Study Bible</title>
+<title>Lectio Study Bible</title>
 <meta name="description" content="A beautiful, distraction-free Bible reader">
 <meta name="theme-color" content="#1A1612" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Study Bible">
+<meta name="apple-mobile-web-app-title" content="Lectio Study Bible">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,7 +63,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .top-left{display:flex;align-items:center;justify-content:flex-start;min-width:0;}
 .top-mid{display:flex;align-items:center;justify-content:center;}
 .top-right{display:flex;align-items:center;justify-content:flex-end;gap:4px;}
-.top-wordmark{font-family:var(--display);font-weight:400;font-style:italic;font-size:1.15rem;letter-spacing:.04em;color:var(--hi);user-select:none;}
+.top-wordmark{font-family:var(--display);font-weight:400;font-style:italic;font-size:1.15rem;letter-spacing:.04em;color:var(--hi);user-select:none;display:inline-flex;align-items:center;gap:7px;}
+.top-wordmark-pill{display:inline-block;background:var(--text);color:var(--bg);font-family:var(--sans);font-style:normal;font-weight:500;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:20px;line-height:1;vertical-align:middle;position:relative;top:-1px;}
 .top-wordmark-right{display:none;}
 .top-ref{display:flex;align-items:center;gap:5px;cursor:pointer;padding:0 10px;height:30px;border-radius:15px;border:1px solid var(--border);background:var(--bg-sub);transition:border-color .2s;user-select:none;min-width:0;max-width:100%;}
 .top-ref:hover{border-color:var(--text-muted);}
@@ -401,21 +402,36 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:0;}
 .mnote:hover .mnote-edit-btn{opacity:1;}
 .mnote-body{font-family:var(--serif);font-size:.8rem;font-style:italic;color:var(--text-soft);line-height:1.55;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.mnote-body b{font-weight:600;font-style:normal;}.mnote-body u{text-underline-offset:2px;}
 .mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
 /* ── Inline margin editor — full width ── */
 .mnote-editor{position:absolute;left:0;right:0;padding:0;z-index:10;}
 .mnote-editor-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:4px 14px 8px 12px;background:var(--bg);}
 .mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:6px;opacity:.8;}
 /* Rich text toolbar */
-.mnote-toolbar{display:flex;align-items:center;gap:1px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-.mnt-btn{width:22px;height:22px;background:none;border:none;border-radius:3px;font-size:.75rem;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;padding:0;}
+.mnote-toolbar{display:flex;align-items:center;gap:1px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.mnt-btn{width:22px;height:22px;background:none;border:none;border-radius:3px;font-size:.72rem;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;padding:0;line-height:1;}
 .mnt-btn:hover{background:var(--bg-sub);color:var(--text);}
 .mnt-btn.active{background:var(--bg-sub);color:var(--note-color,var(--nc-0));}
+.mnt-btn s{text-decoration:line-through;font-size:.72rem;}
+.mnt-btn mark{background:rgba(255,220,0,.35);color:inherit;font-size:.72rem;padding:0 1px;}
 .mnt-sep{width:1px;height:14px;background:var(--border);margin:0 3px;flex-shrink:0;}
 .mnote-ce{min-height:56px;font-family:var(--serif);font-style:italic;font-size:.8rem;line-height:1.55;color:var(--text);outline:none;word-break:break-word;}
 .mnote-ce:empty::before{content:attr(data-placeholder);color:var(--text-muted);pointer-events:none;font-style:italic;}
 .mnote-ce b{font-weight:600;font-style:normal;}.mnote-ce u{text-underline-offset:2px;}
+.mnote-ce s{opacity:.6;}
+.mnote-ce h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color,var(--nc-0));margin:6px 0 2px;text-transform:uppercase;}
+.mnote-ce mark{background:rgba(255,220,0,.3);color:inherit;border-radius:2px;padding:0 2px;}
+.mnote-ce ul,.mnote-ce ol{padding-left:1.2em;margin:2px 0;}
+.mnote-ce li{margin-bottom:1px;}
+[data-theme="night"] .mnote-ce mark{background:rgba(255,220,0,.18);}
+.mnote-body b{font-weight:600;font-style:normal;}.mnote-body u{text-underline-offset:2px;}
+.mnote-body s{opacity:.6;}
+.mnote-body h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color,var(--nc-0));margin:6px 0 2px;text-transform:uppercase;}
+.mnote-body mark{background:rgba(255,220,0,.3);color:inherit;border-radius:2px;padding:0 2px;}
+.mnote-body ul,.mnote-body ol{padding-left:1.2em;margin:2px 0;}
+[data-theme="night"] .mnote-body mark{background:rgba(255,220,0,.18);}
+.mnote-editor-hint{font-family:var(--sans);font-size:.56rem;color:var(--text-muted);letter-spacing:.04em;margin-top:5px;opacity:.7;}
+.mnote-editor-hint kbd{font-family:var(--sans);background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:0 3px;font-size:.55rem;}
 .mnote-editor-actions{display:flex;align-items:center;gap:8px;margin-top:7px;padding-top:5px;border-top:1px solid var(--border);}
 .mne-save{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--note-color,var(--nc-0));cursor:pointer;padding:4px 0;transition:opacity .15s;}
 .mne-save:hover{opacity:.65;}
@@ -505,9 +521,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
       <span class="top-trans-arrow">↓</span>
     </div>
   </div>
-  <div class="top-mid"><span class="top-wordmark top-wordmark-centre">Study Bible</span></div>
+  <div class="top-mid"><span class="top-wordmark top-wordmark-centre">Lectio <span class="top-wordmark-pill">Study Bible</span></span></div>
   <div class="top-right">
-    <span class="top-wordmark top-wordmark-right">Study Bible</span>
+    <span class="top-wordmark top-wordmark-right">Lectio <span class="top-wordmark-pill">Study Bible</span></span>
     <button class="icon-btn" id="planBtn" title="Reading Plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></button>
     <button class="icon-btn" id="searchBtn" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
     <button class="icon-btn" id="bookmarksBtn" title="Bookmarks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
@@ -683,7 +699,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.2</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.3</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -1989,7 +2005,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
   // Keyboard search shortcut
   document.addEventListener('keydown',e=>{
     if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName))return;
+    if(e.target.isContentEditable)return;
     if(e.key==='/')  {e.preventDefault();openSearch();}
+    // N key — open note for first selected verse
+    if(e.key==='n'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+      if(S.selectedVerses&&S.selectedVerses.size>0){
+        e.preventDefault();
+        const v=[...S.selectedVerses].map(Number).sort((a,b)=>a-b)[0];
+        if(window.innerWidth>=900){openInlineEditor(S.book,S.chapter,v);}
+        else{openNoteModal(S.book,S.chapter,v);}
+      }
+    }
   });
 
   // Bookmarks
@@ -2116,11 +2142,18 @@ function openInlineEditor(book, ch, v) {
     <div class="mnote-editor-inner">
       <div class="mnote-editor-ref">${escNote(book)} ${ch}:${v}</div>
       <div class="mnote-toolbar">
-        <button class="mnt-btn" data-cmd="bold" title="Bold"><b>B</b></button>
-        <button class="mnt-btn" data-cmd="italic" title="Italic"><i>I</i></button>
-        <button class="mnt-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+        <button class="mnt-btn" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="mnt-btn" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="mnt-btn" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="mnt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
         <div class="mnt-sep"></div>
-        <button class="mnt-btn" data-cmd="insertUnorderedList" title="List">≡</button>
+        <button class="mnt-btn" data-cmd="hiliteColor" data-val="#FFF3A3" title="Highlight"><mark>H</mark></button>
+        <div class="mnt-sep"></div>
+        <button class="mnt-btn" data-cmd="insertUnorderedList" title="Bullet list">•≡</button>
+        <button class="mnt-btn" data-cmd="insertOrderedList" title="Numbered list">1≡</button>
+        <div class="mnt-sep"></div>
+        <button class="mnt-btn" data-cmd="formatBlock" data-val="h4" title="Heading">H</button>
+        <button class="mnt-btn" data-cmd="formatBlock" data-val="p" title="Paragraph">¶</button>
       </div>
       <div class="mnote-ce" contenteditable="true" data-placeholder="Write a note…">${existing}</div>
       <div class="mnote-editor-actions">
@@ -2128,6 +2161,7 @@ function openInlineEditor(book, ch, v) {
         <button class="mne-cancel">Cancel</button>
         ${existing ? '<button class="mne-delete">Delete</button>' : ''}
       </div>
+      <div class="mnote-editor-hint"><kbd>⌘ Enter</kbd> to save · <kbd>Esc</kbd> to cancel</div>
     </div>`;
 
   margin.appendChild(wrap);
@@ -2141,10 +2175,11 @@ function openInlineEditor(book, ch, v) {
     btn.addEventListener('mousedown', e => {
       e.preventDefault(); // keep focus in ce
       const cmd = btn.dataset.cmd;
-      document.execCommand(cmd, false, null);
+      const val = btn.dataset.val || null;
+      document.execCommand(cmd, false, val);
       // Update active state
       wrap.querySelectorAll('.mnt-btn').forEach(b => {
-        b.classList.toggle('active', document.queryCommandState(b.dataset.cmd));
+        try { b.classList.toggle('active', document.queryCommandState(b.dataset.cmd)); } catch(e){}
       });
       ce.focus();
     });
