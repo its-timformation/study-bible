@@ -398,32 +398,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   #leftMargin,#rightMargin{display:none;}
   #studyLayout{display:block;}
 }
-/* ── Note colour palette ── */
-:root{
-  --nc-0:#B8722E;--nc-1:#5A8FA3;--nc-2:#7A9A5A;--nc-3:#9B6B9B;--nc-4:#A05050;
-}
-[data-theme="night"]{--nc-0:#D4943A;--nc-1:#6BAFC8;--nc-2:#8DB86A;--nc-3:#B88AB8;--nc-4:#C07070;}
-[data-theme="sepia"]{--nc-0:#8B4A18;--nc-1:#3A6878;--nc-2:#507040;--nc-3:#784878;--nc-4:#803030;}
+/* ── Note colour palette — resolved in JS per theme ── */
+:root{ --note-color: #B8722E; }
 /* ── Verse note indicator — coloured dashed underline ── */
-.verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--note-color,var(--nc-0));}
+.verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--note-color);}
 /* ── Margin note — normal flow, full width ── */
 .mnote{width:100%;padding:0;cursor:default;}
-.mnote-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:4px 16px 6px 12px;transition:opacity .2s;}
+.mnote-inner{border-left:2.5px solid var(--note-color);padding:4px 16px 6px 12px;transition:opacity .2s;}
 .mnote:hover .mnote-inner{opacity:.8;}
-.mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
+.mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
 .mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:0;}
 .mnote:hover .mnote-edit-btn{opacity:1;}
 .mnote-body{font-family:var(--serif);font-size:.8rem;font-style:italic;color:var(--text-soft);line-height:1.55;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
 /* ── Inline margin editor — normal flow, full width ── */
 .mnote-editor{width:100%;padding:0;z-index:10;}
-.mnote-editor-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:6px 16px 10px 12px;background:var(--bg);}
-.mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:6px;opacity:.8;}
+.mnote-editor-inner{border-left:2.5px solid var(--note-color);padding:6px 16px 10px 12px;background:var(--bg);}
+.mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:6px;opacity:.8;}
 /* Rich text toolbar */
 .mnote-toolbar{display:flex;align-items:center;gap:1px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .mnt-btn{width:22px;height:22px;background:none;border:none;border-radius:3px;font-size:.72rem;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;padding:0;line-height:1;}
 .mnt-btn:hover{background:var(--bg-sub);color:var(--text);}
-.mnt-btn.active{background:var(--bg-sub);color:var(--note-color,var(--nc-0));}
+.mnt-btn.active{background:var(--bg-sub);color:var(--note-color);}
 .mnt-btn s{text-decoration:line-through;font-size:.72rem;}
 .mnt-btn mark{background:rgba(255,220,0,.35);color:inherit;font-size:.72rem;padding:0 1px;}
 .mnt-sep{width:1px;height:14px;background:var(--border);margin:0 3px;flex-shrink:0;}
@@ -431,21 +427,21 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .mnote-ce:empty::before{content:attr(data-placeholder);color:var(--text-muted);pointer-events:none;font-style:italic;}
 .mnote-ce b{font-weight:600;font-style:normal;}.mnote-ce u{text-underline-offset:2px;}
 .mnote-ce s{opacity:.6;}
-.mnote-ce h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color,var(--nc-0));margin:6px 0 2px;text-transform:uppercase;}
+.mnote-ce h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color);margin:6px 0 2px;text-transform:uppercase;}
 .mnote-ce mark{background:rgba(255,220,0,.3);color:inherit;border-radius:2px;padding:0 2px;}
 .mnote-ce ul,.mnote-ce ol{padding-left:1.2em;margin:2px 0;}
 .mnote-ce li{margin-bottom:1px;}
 [data-theme="night"] .mnote-ce mark{background:rgba(255,220,0,.18);}
 .mnote-body b{font-weight:600;font-style:normal;}.mnote-body u{text-underline-offset:2px;}
 .mnote-body s{opacity:.6;}
-.mnote-body h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color,var(--nc-0));margin:6px 0 2px;text-transform:uppercase;}
+.mnote-body h4{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;font-weight:600;font-style:normal;color:var(--note-color);margin:6px 0 2px;text-transform:uppercase;}
 .mnote-body mark{background:rgba(255,220,0,.3);color:inherit;border-radius:2px;padding:0 2px;}
 .mnote-body ul,.mnote-body ol{padding-left:1.2em;margin:2px 0;}
 [data-theme="night"] .mnote-body mark{background:rgba(255,220,0,.18);}
 .mnote-editor-hint{font-family:var(--sans);font-size:.56rem;color:var(--text-muted);letter-spacing:.04em;margin-top:5px;opacity:.7;}
 .mnote-editor-hint kbd{font-family:var(--sans);background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:0 3px;font-size:.55rem;}
 .mnote-editor-actions{display:flex;align-items:center;gap:8px;margin-top:7px;padding-top:5px;border-top:1px solid var(--border);}
-.mne-save{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--note-color,var(--nc-0));cursor:pointer;padding:4px 0;transition:opacity .15s;}
+.mne-save{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--note-color);cursor:pointer;padding:4px 0;transition:opacity .15s;}
 .mne-save:hover{opacity:.65;}
 .mne-cancel{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;padding:4px 0;transition:color .15s;}
 .mne-cancel:hover{color:var(--text);}
@@ -711,7 +707,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.4</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.5</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2113,7 +2109,15 @@ function notesSave(){localStorage.setItem(NOTES_KEY,JSON.stringify(NOTES));}
 function noteKey(book,ch,v){return`${book}|${ch}|${v}`;}
 const NOTES = notesLoad();
 
-const NOTE_COLORS = ['var(--nc-0)','var(--nc-1)','var(--nc-2)','var(--nc-3)','var(--nc-4)'];
+// Note colours — direct hex per theme resolved at runtime
+function getNoteColorPalette() {
+  const theme = document.documentElement.dataset.theme || 'light';
+  if (theme === 'night')  return ['#D4943A','#6BAFC8','#8DB86A','#B88AB8','#C07070'];
+  if (theme === 'sepia')  return ['#8B4A18','#3A6878','#507040','#784878','#803030'];
+  return ['#B8722E','#5A8FA3','#7A9A5A','#9B6B9B','#A05050'];
+}
+// Keep NOTE_COLORS as a getter so it responds to theme changes
+Object.defineProperty(window, 'NOTE_COLORS', { get: getNoteColorPalette });
 
 function getChapterNotesSorted(book, ch) {
   return Object.keys(NOTES)
