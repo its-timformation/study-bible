@@ -380,6 +380,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   #leftMargin,#rightMargin{
     position:sticky;
     top:52px;
+    width:256px;
     max-height:calc(100vh - 52px);
     overflow-y:auto;
     overflow-x:hidden;
@@ -388,6 +389,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
     display:flex;
     flex-direction:column;
     gap:24px;
+    box-sizing:border-box;
   }
   #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
   #leftMargin{border-right:1px solid var(--col-rule);}
@@ -403,7 +405,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 /* ── Verse note indicator — coloured dashed underline ── */
 .verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--note-color);}
 /* ── Margin note — normal flow, full width ── */
-.mnote{width:100%;padding:0;cursor:default;}
+.mnote{width:100%;box-sizing:border-box;padding:0;cursor:default;}
 .mnote-inner{border-left:2.5px solid var(--note-color);padding:4px 16px 6px 12px;transition:opacity .2s;}
 .mnote:hover .mnote-inner{opacity:.8;}
 .mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
@@ -411,8 +413,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .mnote:hover .mnote-edit-btn{opacity:1;}
 .mnote-body{font-family:var(--serif);font-size:.8rem;font-style:italic;color:var(--text-soft);line-height:1.55;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
-/* ── Inline margin editor — normal flow, full width ── */
-.mnote-editor{width:100%;padding:0;z-index:10;}
+/* ── Inline margin editor — full width ── */
+.mnote-editor{width:100%;box-sizing:border-box;padding:0;z-index:10;}
 .mnote-editor-inner{border-left:2.5px solid var(--note-color);padding:6px 16px 10px 12px;background:var(--bg);}
 .mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:6px;opacity:.8;}
 /* Rich text toolbar */
@@ -543,7 +545,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 <div class="comp-tab-strip" id="compTabStrip"><div class="comp-tab-strip-inner" id="compTabInner"></div></div>
 
 <div id="studyLayout">
-  <aside id="leftMargin"><svg id="noteConnectorsL" class="note-connectors-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg></aside>
+  <aside id="leftMargin"></aside>
   <div id="studyPageCol">
     <div class="page">
       <div id="readingSurface" class="reading-surface"><div class="status-msg">A quiet place to read.</div></div>
@@ -553,7 +555,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
       </nav>
     </div>
   </div>
-  <aside id="rightMargin"><svg id="noteConnectorsR" class="note-connectors-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg></aside>
+  <aside id="rightMargin"></aside>
 </div>
 
 <!-- Verse action bar -->
@@ -707,7 +709,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.5</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.6</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2320,15 +2322,9 @@ function renderMarginNotes() {
   const right = document.getElementById('rightMargin');
   if (!left || !right) return;
 
-  // Clear existing note cards (keep SVG canvases if any)
-  [...left.children].forEach(c  => { if (c.tagName !== 'svg' && !c.classList.contains('mnote-editor')) c.remove(); });
-  [...right.children].forEach(c => { if (c.tagName !== 'svg' && !c.classList.contains('mnote-editor')) c.remove(); });
-
-  // Clear SVG connectors
-  const svgL = document.getElementById('noteConnectorsL');
-  const svgR = document.getElementById('noteConnectorsR');
-  if (svgL) svgL.innerHTML = '';
-  if (svgR) svgR.innerHTML = '';
+  // Clear existing note cards
+  [...left.children].forEach(c  => { if (!c.classList.contains('mnote-editor')) c.remove(); });
+  [...right.children].forEach(c => { if (!c.classList.contains('mnote-editor')) c.remove(); });
 
   const sorted = getChapterNotesSorted(S.book, S.chapter);
   if (!sorted.length) return;
