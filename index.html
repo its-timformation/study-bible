@@ -376,8 +376,20 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 
 /* ══ STUDY BIBLE — DESKTOP MARGIN LAYOUT ══════════════════════ */
 @media(min-width:900px){
-  #studyLayout{display:grid;grid-template-columns:228px 1fr 228px;min-height:calc(100vh - 52px);max-width:1480px;margin:0 auto;align-items:start;}
-  #leftMargin,#rightMargin{position:relative;padding:0 0 80px;}
+  #studyLayout{display:grid;grid-template-columns:256px 1fr 256px;min-height:calc(100vh - 52px);max-width:1520px;margin:0 auto;align-items:start;}
+  #leftMargin,#rightMargin{
+    position:sticky;
+    top:52px;
+    max-height:calc(100vh - 52px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:none;
+    padding:32px 0 80px;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+  }
+  #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
   #leftMargin{border-right:1px solid var(--col-rule);}
   #rightMargin{border-left:1px solid var(--col-rule);}
   #studyPageCol{min-width:0;}
@@ -394,18 +406,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 [data-theme="sepia"]{--nc-0:#8B4A18;--nc-1:#3A6878;--nc-2:#507040;--nc-3:#784878;--nc-4:#803030;}
 /* ── Verse note indicator — coloured dashed underline ── */
 .verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--note-color,var(--nc-0));}
-/* ── Margin note — full width, unboxed ── */
-.mnote{position:absolute;left:0;right:0;padding:0;cursor:default;}
-.mnote-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:2px 14px 4px 12px;transition:opacity .2s;}
+/* ── Margin note — normal flow, full width ── */
+.mnote{width:100%;padding:0;cursor:default;}
+.mnote-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:4px 16px 6px 12px;transition:opacity .2s;}
 .mnote:hover .mnote-inner{opacity:.8;}
-.mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
+.mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
 .mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:0;}
 .mnote:hover .mnote-edit-btn{opacity:1;}
 .mnote-body{font-family:var(--serif);font-size:.8rem;font-style:italic;color:var(--text-soft);line-height:1.55;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
-/* ── Inline margin editor — full width ── */
-.mnote-editor{position:absolute;left:0;right:0;padding:0;z-index:10;}
-.mnote-editor-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:4px 14px 8px 12px;background:var(--bg);}
+/* ── Inline margin editor — normal flow, full width ── */
+.mnote-editor{width:100%;padding:0;z-index:10;}
+.mnote-editor-inner{border-left:2.5px solid var(--note-color,var(--nc-0));padding:6px 16px 10px 12px;background:var(--bg);}
 .mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color,var(--nc-0));margin-bottom:6px;opacity:.8;}
 /* Rich text toolbar */
 .mnote-toolbar{display:flex;align-items:center;gap:1px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
@@ -699,7 +711,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.3</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.4</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2093,7 +2105,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   render(true);
 });
 
-// ══ STUDY NOTES SYSTEM v3 ═════════════════════════════════════
+// ══ STUDY NOTES SYSTEM v4 ═════════════════════════════════════
 
 const NOTES_KEY = 'study-bible-notes';
 function notesLoad(){try{return JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');}catch(e){return{};}}
@@ -2101,15 +2113,18 @@ function notesSave(){localStorage.setItem(NOTES_KEY,JSON.stringify(NOTES));}
 function noteKey(book,ch,v){return`${book}|${ch}|${v}`;}
 const NOTES = notesLoad();
 
-// Note colour palette — assigned by index in chapter note list
 const NOTE_COLORS = ['var(--nc-0)','var(--nc-1)','var(--nc-2)','var(--nc-3)','var(--nc-4)'];
 
-function getNoteColor(book, ch, v) {
-  const chNotes = Object.keys(NOTES)
+function getChapterNotesSorted(book, ch) {
+  return Object.keys(NOTES)
     .filter(k => { const[b,c]=k.split('|'); return b===book&&parseInt(c)===ch; })
     .map(k => parseInt(k.split('|')[2]))
-    .sort((a,b)=>a-b);
-  const idx = chNotes.indexOf(parseInt(v));
+    .sort((a,b) => a-b);
+}
+
+function getNoteColor(book, ch, v) {
+  const sorted = getChapterNotesSorted(book, ch);
+  const idx = sorted.indexOf(parseInt(v));
   return NOTE_COLORS[idx >= 0 ? idx % NOTE_COLORS.length : 0];
 }
 
@@ -2123,28 +2138,31 @@ let _activeEditor = null;
 function openInlineEditor(book, ch, v) {
   closeInlineEditor(false);
 
-  const isRight = _noteIsRight(book, ch, v);
+  const sorted = getChapterNotesSorted(book, ch);
+  // Include this verse in the sorted list for colour assignment even if it's new
+  const colorIdx = (() => {
+    const allVerses = [...new Set([...sorted, parseInt(v)])].sort((a,b)=>a-b);
+    return allVerses.indexOf(parseInt(v));
+  })();
+  const color = NOTE_COLORS[colorIdx % NOTE_COLORS.length];
+
+  const isRight = colorIdx % 2 === 0;
   const margin = document.getElementById(isRight ? 'rightMargin' : 'leftMargin');
   if (!margin) { openNoteModal(book, ch, v); return; }
 
   const existing = NOTES[noteKey(book, ch, v)] || '';
-  const color = getNoteColor(book, ch, v);
-
-  const verseEl = _getVerseEl(v);
-  const topPx = verseEl ? _verseTopInLayout(verseEl) : 40;
 
   const wrap = document.createElement('div');
   wrap.className = 'mnote-editor';
-  wrap.style.top = topPx + 'px';
   wrap.style.setProperty('--note-color', color);
 
   wrap.innerHTML = `
     <div class="mnote-editor-inner">
       <div class="mnote-editor-ref">${escNote(book)} ${ch}:${v}</div>
       <div class="mnote-toolbar">
-        <button class="mnt-btn" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
-        <button class="mnt-btn" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
-        <button class="mnt-btn" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="mnt-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+        <button class="mnt-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+        <button class="mnt-btn" data-cmd="underline" title="Underline"><u>U</u></button>
         <button class="mnt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
         <div class="mnt-sep"></div>
         <button class="mnt-btn" data-cmd="hiliteColor" data-val="#FFF3A3" title="Highlight"><mark>H</mark></button>
@@ -2153,7 +2171,7 @@ function openInlineEditor(book, ch, v) {
         <button class="mnt-btn" data-cmd="insertOrderedList" title="Numbered list">1≡</button>
         <div class="mnt-sep"></div>
         <button class="mnt-btn" data-cmd="formatBlock" data-val="h4" title="Heading">H</button>
-        <button class="mnt-btn" data-cmd="formatBlock" data-val="p" title="Paragraph">¶</button>
+        <button class="mnt-btn" data-cmd="formatBlock" data-val="p" title="Normal">¶</button>
       </div>
       <div class="mnote-ce" contenteditable="true" data-placeholder="Write a note…">${existing}</div>
       <div class="mnote-editor-actions">
@@ -2161,32 +2179,29 @@ function openInlineEditor(book, ch, v) {
         <button class="mne-cancel">Cancel</button>
         ${existing ? '<button class="mne-delete">Delete</button>' : ''}
       </div>
-      <div class="mnote-editor-hint"><kbd>⌘ Enter</kbd> to save · <kbd>Esc</kbd> to cancel</div>
+      <div class="mnote-editor-hint"><kbd>⌘ Enter</kbd> to save &middot; <kbd>Esc</kbd> to cancel</div>
     </div>`;
 
-  margin.appendChild(wrap);
+  // Prepend editor to margin so it appears at top
+  margin.insertBefore(wrap, margin.firstChild);
   _activeEditor = { el: wrap, book, ch, v };
 
   const ce = wrap.querySelector('.mnote-ce');
   setTimeout(() => { ce.focus(); _placeCursorAtEnd(ce); }, 40);
 
-  // Toolbar buttons
+  // Toolbar
   wrap.querySelectorAll('.mnt-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => {
-      e.preventDefault(); // keep focus in ce
+      e.preventDefault();
       const cmd = btn.dataset.cmd;
       const val = btn.dataset.val || null;
       document.execCommand(cmd, false, val);
-      // Update active state
-      wrap.querySelectorAll('.mnt-btn').forEach(b => {
-        try { b.classList.toggle('active', document.queryCommandState(b.dataset.cmd)); } catch(e){}
-      });
+      updateToolbarState(wrap);
       ce.focus();
     });
   });
 
-  // Update toolbar active states on selection change
-  ce.addEventListener('keyup', () => updateToolbarState(wrap));
+  ce.addEventListener('keyup',   () => updateToolbarState(wrap));
   ce.addEventListener('mouseup', () => updateToolbarState(wrap));
 
   wrap.querySelector('.mne-save').addEventListener('click', () => saveInlineNote(wrap, book, ch, v));
@@ -2202,7 +2217,7 @@ function openInlineEditor(book, ch, v) {
 
   ce.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeInlineEditor(true); e.stopPropagation(); }
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveInlineNote(wrap, book, ch, v);
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveInlineNote(wrap, book, ch, v); }
   });
 }
 
@@ -2245,11 +2260,8 @@ document.getElementById('vabNote').addEventListener('click', () => {
   const v = vs[0];
   S.selectedVerses.clear();
   updateActionBar();
-  if (window.innerWidth >= 900) {
-    openInlineEditor(S.book, S.chapter, v);
-  } else {
-    openNoteModal(S.book, S.chapter, v);
-  }
+  if (window.innerWidth >= 900) { openInlineEditor(S.book, S.chapter, v); }
+  else { openNoteModal(S.book, S.chapter, v); }
 });
 
 // ── Modal (mobile fallback) ────────────────────────────────────
@@ -2290,130 +2302,62 @@ function refreshNoteIndicators() {
   document.querySelectorAll('.verse-line.has-note,.v-span.has-note')
     .forEach(el => { el.classList.remove('has-note'); el.style.removeProperty('--note-color'); });
 
-  const chNotes = Object.keys(NOTES)
-    .filter(k => { const[b,c]=k.split('|'); return b===S.book&&parseInt(c)===S.chapter; })
-    .map(k => parseInt(k.split('|')[2]))
-    .sort((a,b)=>a-b);
-
-  chNotes.forEach((v, idx) => {
+  const sorted = getChapterNotesSorted(S.book, S.chapter);
+  sorted.forEach((v, idx) => {
     const color = NOTE_COLORS[idx % NOTE_COLORS.length];
     document.querySelectorAll(`.verse-line[data-v="${v}"],.v-span[data-v="${v}"]`)
-      .forEach(el => {
-        el.classList.add('has-note');
-        el.style.setProperty('--note-color', color);
-      });
+      .forEach(el => { el.classList.add('has-note'); el.style.setProperty('--note-color', color); });
   });
 }
 
-// ── Layout helpers ─────────────────────────────────────────────
-function _getVerseEl(v) {
-  return document.querySelector(`.verse-line[data-v="${v}"],.v-span[data-v="${v}"]`);
-}
-function _verseTopInLayout(verseEl) {
-  const layout = document.getElementById('studyLayout');
-  if (!layout) return 0;
-  const vRect = verseEl.getBoundingClientRect();
-  const lRect = layout.getBoundingClientRect();
-  return vRect.top - lRect.top + window.scrollY;
-}
-function _noteIsRight(book, ch, v) {
-  const chNotes = Object.keys(NOTES)
-    .filter(k => { const[b,c]=k.split('|'); return b===book&&parseInt(c)===ch; })
-    .map(k => parseInt(k.split('|')[2]))
-    .sort((a,b)=>a-b);
-  const idx = chNotes.indexOf(parseInt(v));
-  return idx % 2 === 0;
-}
-
-// ── Margin notes render ────────────────────────────────────────
+// ── Margin notes render — normal flow, alternating margins ────
 function renderMarginNotes() {
   const left  = document.getElementById('leftMargin');
   const right = document.getElementById('rightMargin');
   if (!left || !right) return;
 
-  [...left.children].forEach(c => { if (c.tagName !== 'svg') c.remove(); });
-  [...right.children].forEach(c => { if (c.tagName !== 'svg') c.remove(); });
+  // Clear existing note cards (keep SVG canvases if any)
+  [...left.children].forEach(c  => { if (c.tagName !== 'svg' && !c.classList.contains('mnote-editor')) c.remove(); });
+  [...right.children].forEach(c => { if (c.tagName !== 'svg' && !c.classList.contains('mnote-editor')) c.remove(); });
+
+  // Clear SVG connectors
   const svgL = document.getElementById('noteConnectorsL');
   const svgR = document.getElementById('noteConnectorsR');
   if (svgL) svgL.innerHTML = '';
   if (svgR) svgR.innerHTML = '';
 
-  const chNotes = Object.entries(NOTES)
-    .filter(([key]) => { const[b,c]=key.split('|'); return b===S.book&&parseInt(c)===S.chapter; })
-    .map(([key, html]) => { const[,,v]=key.split('|'); return {v: parseInt(v), html}; })
-    .sort((a,b) => a.v - b.v);
+  const sorted = getChapterNotesSorted(S.book, S.chapter);
+  if (!sorted.length) return;
 
-  if (!chNotes.length) return;
+  sorted.forEach((v, i) => {
+    const html  = NOTES[noteKey(S.book, S.chapter, v)];
+    if (!html) return;
 
-  requestAnimationFrame(() => {
-    const layout = document.getElementById('studyLayout');
-    if (!layout) return;
-    const lRect = layout.getBoundingClientRect();
+    const isRight = i % 2 === 0;
+    const margin  = isRight ? right : left;
+    const color   = NOTE_COLORS[i % NOTE_COLORS.length];
 
-    chNotes.forEach((note, i) => {
-      const isRight = i % 2 === 0;
-      const margin  = isRight ? right : left;
-      const svg     = isRight ? svgR  : svgL;
-      const color   = NOTE_COLORS[i % NOTE_COLORS.length];
+    const wrap = document.createElement('div');
+    wrap.className = 'mnote';
+    wrap.dataset.v = v;
+    wrap.style.setProperty('--note-color', color);
 
-      const verseEl = _getVerseEl(note.v);
-      const topPx = verseEl ? (() => {
-        const vRect = verseEl.getBoundingClientRect();
-        return vRect.top - lRect.top + window.scrollY;
-      })() : (i * 80 + 40);
+    wrap.innerHTML = `
+      <div class="mnote-inner">
+        <div class="mnote-ref">
+          ${escNote(S.book)} ${S.chapter}:${v}
+          <button class="mnote-edit-btn" data-v="${v}">edit</button>
+        </div>
+        <div class="mnote-body">${html}</div>
+      </div>`;
 
-      const wrap = document.createElement('div');
-      wrap.className = 'mnote';
-      wrap.dataset.v = note.v;
-      wrap.style.top = topPx + 'px';
-      wrap.style.setProperty('--note-color', color);
-
-      wrap.innerHTML = `
-        <div class="mnote-inner">
-          <div class="mnote-ref">
-            ${escNote(S.book)} ${S.chapter}:${note.v}
-            <button class="mnote-edit-btn" data-v="${note.v}">edit</button>
-          </div>
-          <div class="mnote-body">${note.html}</div>
-        </div>`;
-
-      wrap.querySelector('.mnote-body').addEventListener('click', () => wrap.classList.toggle('expanded'));
-      wrap.querySelector('.mnote-edit-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v));
-      });
-
-      margin.appendChild(wrap);
-
-      // Connector
-      if (svg && verseEl) {
-        requestAnimationFrame(() => {
-          const marginRect = margin.getBoundingClientRect();
-          const vRect = verseEl.getBoundingClientRect();
-          const wRect = wrap.getBoundingClientRect();
-
-          const verseAnchorX = isRight
-            ? vRect.right - marginRect.left
-            : vRect.left  - marginRect.left;
-          const verseAnchorY = vRect.top + vRect.height / 2 - marginRect.top;
-          const noteAnchorX  = isRight ? 12 : margin.offsetWidth - 12;
-          const noteAnchorY  = wRect.top + 8 - marginRect.top;
-
-          const cx1 = isRight ? verseAnchorX + 24 : verseAnchorX - 24;
-          const cx2 = isRight ? noteAnchorX  - 24 : noteAnchorX  + 24;
-
-          // Resolve CSS variable to actual colour for SVG stroke
-          const resolvedColor = getComputedStyle(document.documentElement)
-            .getPropertyValue(color.replace('var(','').replace(')','').trim()) || '#B8722E';
-
-          const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-          path.setAttribute('class','note-connector');
-          path.setAttribute('stroke', resolvedColor.trim());
-          path.setAttribute('d',`M ${verseAnchorX} ${verseAnchorY} C ${cx1} ${verseAnchorY}, ${cx2} ${noteAnchorY}, ${noteAnchorX} ${noteAnchorY}`);
-          svg.appendChild(path);
-        });
-      }
+    wrap.querySelector('.mnote-body').addEventListener('click', () => wrap.classList.toggle('expanded'));
+    wrap.querySelector('.mnote-edit-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v));
     });
+
+    margin.appendChild(wrap);
   });
 }
 
@@ -2424,12 +2368,10 @@ new MutationObserver(() => {
   renderMarginNotes();
 }).observe(document.getElementById('readingSurface'), {childList: true, subtree: false});
 
-window.addEventListener('scroll', () => renderMarginNotes(), {passive: true});
-window.addEventListener('resize', () => renderMarginNotes(), {passive: true});
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeInlineEditor(true);
 });
+
 
 </script>
 
