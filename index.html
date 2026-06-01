@@ -149,7 +149,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .hide-verse-nums .verse-num,.hide-verse-nums [data-number]{display:none;}
 
 /* ── Verse selection ── */
-.verse-line.v-selected,.v-span.v-selected{text-decoration:underline;text-decoration-color:var(--hi);text-underline-offset:3px;text-decoration-thickness:2px;}
+.verse-line.v-selected{background:rgba(0,0,0,.06);border-radius:3px;}
+.v-span.v-selected{background:rgba(0,0,0,.06);border-radius:2px;}
+[data-theme="night"] .verse-line.v-selected,[data-theme="night"] .v-span.v-selected{background:rgba(255,255,255,.08);}
+[data-theme="sepia"] .verse-line.v-selected,[data-theme="sepia"] .v-span.v-selected{background:rgba(0,0,0,.07);}
 .verse-line[data-highlight="yellow"]{background:rgba(255,220,50,.28);}
 .verse-line[data-highlight="green"]{background:rgba(80,180,80,.22);}
 .verse-line[data-highlight="blue"]{background:rgba(60,140,240,.2);}
@@ -402,7 +405,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   }
   #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
   #studyPageCol{min-width:0;border:none;}
-  .reading-surface{max-width:100% !important;padding:0 8px !important;}
+  .reading-surface{max-width:100% !important;padding:0 24px !important;}
 }
 
 /* ── Medium: one margin (right only) ── */
@@ -449,7 +452,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .mnote{display:block;cursor:default;}
 .mnote-inner{border-left:2.5px solid var(--note-color);padding:5px 12px 6px 10px;}
 .mnote:hover .mnote-inner{opacity:.8;}
-.mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
+.mnote-ref{font-family:var(--sc);font-size:.62rem;letter-spacing:.16em;color:var(--note-color);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;font-weight:500;}
 .mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:2px 0;min-height:24px;}
 .mnote:hover .mnote-edit-btn{opacity:1;}
 .mnote-body{font-family:var(--serif);font-size:.79rem;font-style:italic;color:var(--text-soft);line-height:1.5;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
@@ -467,18 +470,26 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 /* Rich text toolbar */
 .mnote-toolbar{display:flex;align-items:center;gap:2px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .mnt-btn{
-  width:28px;height:28px;
-  background:none;border:1px solid transparent;border-radius:4px;
-  font-size:.78rem;color:var(--text-soft);cursor:pointer;
+  min-width:30px;height:30px;
+  background:var(--bg-sub);
+  border:1px solid var(--border);
+  border-radius:5px;
+  font-size:.8rem;
+  font-weight:600;
+  color:var(--text-soft);
+  cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:background .12s,color .12s,border-color .12s;
-  padding:0;line-height:1;
+  transition:background .12s,color .12s,border-color .12s,box-shadow .12s;
+  padding:0 5px;
+  line-height:1;
+  letter-spacing:0;
 }
-.mnt-btn:hover{background:var(--bg-sub);color:var(--text);border-color:var(--border);}
-.mnt-btn.active{background:var(--bg-sub);color:var(--note-color);border-color:var(--note-color);}
-.mnt-btn s{text-decoration:line-through;font-size:.78rem;}
-.mnt-btn mark{background:rgba(255,220,0,.45);color:var(--text);font-size:.78rem;padding:0 1px;}
-.mnt-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0;}
+.mnt-btn:hover{background:var(--border);color:var(--text);border-color:var(--text-muted);}
+.mnt-btn:focus-visible{outline:2px solid var(--note-color);outline-offset:1px;}
+.mnt-btn.active{background:var(--note-color);color:#fff;border-color:var(--note-color);}
+.mnt-btn s{text-decoration:line-through;font-size:.8rem;font-weight:600;}
+.mnt-btn mark{background:rgba(255,220,0,.55);color:var(--text);font-size:.8rem;font-weight:700;padding:0 1px;border-radius:1px;}
+.mnt-sep{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0;}
 
 /* Contenteditable area — fill available width */
 .mnote-ce{
@@ -520,6 +531,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .mne-cancel:hover{color:var(--text);}
 .mne-delete{margin-left:auto;background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:300;letter-spacing:.1em;color:var(--text-muted);cursor:pointer;padding:4px 0;transition:color .15s;opacity:.55;}
 .mne-delete:hover{color:#964040;opacity:1;}
+/* ── Note group (multiple notes per verse) ── */
+.mnote-group{display:flex;flex-direction:column;}
+.mnote-continuation-rule{height:1px;background:var(--border);margin:0 0 4px 12px;opacity:.5;}
+.mnote-ref-actions{display:flex;align-items:center;gap:6px;}
+.mnote-add-btn{background:none;border:none;font-family:var(--sans);font-size:.7rem;color:var(--note-color);cursor:pointer;padding:0;opacity:0;transition:opacity .15s;font-weight:500;line-height:1;}
+.mnote:hover .mnote-add-btn,.mnote-group:hover .mnote-add-btn{opacity:1;}
+.mnote-add-row{padding:2px 12px 6px 12px;opacity:0;transition:opacity .15s;}
+.mnote-group:hover .mnote-add-row{opacity:1;}
+.mnote-add-row-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;letter-spacing:.06em;color:var(--note-color);cursor:pointer;padding:2px 0;opacity:.7;transition:opacity .15s;}
+.mnote-add-row-btn:hover{opacity:1;}
 /* ── Connector line SVG ── */
 .note-connector{stroke-width:1;fill:none;opacity:.4;}
 
@@ -781,7 +802,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.12</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.1.0</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2183,12 +2204,28 @@ document.addEventListener('DOMContentLoaded',async()=>{
   render(true);
 });
 
-// ══ STUDY NOTES SYSTEM v4 ═════════════════════════════════════
+// ══ STUDY NOTES SYSTEM v5 ═════════════════════════════════════
+// Storage schema: NOTES[key] = [{id, html, ts}]  (array, multi-note per verse)
+// Key format: "Book|chapter|verse"
 
 const NOTES_KEY = 'study-bible-notes';
-function notesLoad(){try{return JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');}catch(e){return{};}}
-function notesSave(){localStorage.setItem(NOTES_KEY,JSON.stringify(NOTES));}
-function noteKey(book,ch,v){return`${book}|${ch}|${v}`;}
+
+function notesLoad() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+    // Migrate v4 (single string) → v5 (array)
+    const migrated = {};
+    for (const [k, v] of Object.entries(raw)) {
+      if (Array.isArray(v)) { migrated[k] = v; }
+      else if (typeof v === 'string' && v.trim()) {
+        migrated[k] = [{ id: Date.now() + Math.random(), html: v, ts: Date.now() }];
+      }
+    }
+    return migrated;
+  } catch(e) { return {}; }
+}
+function notesSave() { localStorage.setItem(NOTES_KEY, JSON.stringify(NOTES)); }
+function noteKey(book, ch, v) { return `${book}|${ch}|${v}`; }
 const NOTES = notesLoad();
 
 // Note colours — direct hex per theme resolved at runtime
@@ -2198,34 +2235,31 @@ function getNoteColorPalette() {
   if (theme === 'sepia')  return ['#8B4A18','#3A6878','#507040','#784878','#803030'];
   return ['#B8722E','#5A8FA3','#7A9A5A','#9B6B9B','#A05050'];
 }
-// Keep NOTE_COLORS as a getter so it responds to theme changes
 Object.defineProperty(window, 'NOTE_COLORS', { get: getNoteColorPalette });
 
+// Returns verse numbers that have at least one note, sorted ascending
 function getChapterNotesSorted(book, ch) {
   return Object.keys(NOTES)
-    .filter(k => { const[b,c]=k.split('|'); return b===book&&parseInt(c)===ch; })
+    .filter(k => {
+      const [b, c] = k.split('|');
+      return b === book && parseInt(c) === ch && NOTES[k] && NOTES[k].length > 0;
+    })
     .map(k => parseInt(k.split('|')[2]))
-    .sort((a,b) => a-b);
+    .sort((a, b) => a - b);
 }
 
-function getNoteColor(book, ch, v) {
-  const sorted = getChapterNotesSorted(book, ch);
-  const idx = sorted.indexOf(parseInt(v));
-  return NOTE_COLORS[idx >= 0 ? idx % NOTE_COLORS.length : 0];
-}
-
-function escNote(s){
+function escNote(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── Inline margin editor ───────────────────────────────────────
 let _activeEditor = null;
 
-function openInlineEditor(book, ch, v) {
+// noteId: null = new note, string = editing existing
+function openInlineEditor(book, ch, v, noteId) {
   closeInlineEditor(false);
 
   const sorted = getChapterNotesSorted(book, ch);
-  // Include this verse in the sorted list for colour assignment even if it's new
   const colorIdx = (() => {
     const allVerses = [...new Set([...sorted, parseInt(v)])].sort((a,b)=>a-b);
     return allVerses.indexOf(parseInt(v));
@@ -2237,7 +2271,11 @@ function openInlineEditor(book, ch, v) {
   const margin = document.getElementById(isRight ? 'rightMargin' : 'leftMargin');
   if (!margin) { openNoteModal(book, ch, v); return; }
 
-  const existing = NOTES[noteKey(book, ch, v)] || '';
+  // Find existing note if editing
+  const key = noteKey(book, ch, v);
+  const noteArr = NOTES[key] || [];
+  const existingNote = noteId ? noteArr.find(n => n.id == noteId) : null;
+  const existing = existingNote ? existingNote.html : '';
 
   const wrap = document.createElement('div');
   wrap.className = 'mnote-editor';
@@ -2245,33 +2283,32 @@ function openInlineEditor(book, ch, v) {
 
   wrap.innerHTML = `
     <div class="mnote-editor-inner">
-      <div class="mnote-editor-ref">${escNote(book)} ${ch}:${v}</div>
+      <div class="mnote-editor-ref">${escNote(book)} ${ch}:${v}${noteId ? ' — editing' : ' — new note'}</div>
       <div class="mnote-toolbar">
-        <button class="mnt-btn" data-cmd="bold" title="Bold"><b>B</b></button>
-        <button class="mnt-btn" data-cmd="italic" title="Italic"><i>I</i></button>
-        <button class="mnt-btn" data-cmd="underline" title="Underline"><u>U</u></button>
-        <button class="mnt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
-        <div class="mnt-sep"></div>
-        <button class="mnt-btn" data-cmd="hiliteColor" data-val="#FFF3A3" title="Highlight"><mark>H</mark></button>
-        <div class="mnt-sep"></div>
-        <button class="mnt-btn" data-cmd="insertUnorderedList" title="Bullet list">•≡</button>
-        <button class="mnt-btn" data-cmd="insertOrderedList" title="Numbered list">1≡</button>
-        <div class="mnt-sep"></div>
-        <button class="mnt-btn" data-cmd="formatBlock" data-val="h4" title="Heading">H</button>
-        <button class="mnt-btn" data-cmd="formatBlock" data-val="p" title="Normal">¶</button>
+        <button class="mnt-btn" data-cmd="bold" title="Bold (⌘B)" aria-label="Bold"><b>B</b></button>
+        <button class="mnt-btn" data-cmd="italic" title="Italic (⌘I)" aria-label="Italic"><i>I</i></button>
+        <button class="mnt-btn" data-cmd="underline" title="Underline (⌘U)" aria-label="Underline"><u>U</u></button>
+        <button class="mnt-btn" data-cmd="strikeThrough" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button>
+        <div class="mnt-sep" role="separator"></div>
+        <button class="mnt-btn" data-cmd="hiliteColor" data-val="#FFF3A3" title="Highlight" aria-label="Highlight"><mark>H</mark></button>
+        <div class="mnt-sep" role="separator"></div>
+        <button class="mnt-btn" data-cmd="insertUnorderedList" title="Bullet list" aria-label="Bullet list" style="font-size:.7rem">•≡</button>
+        <button class="mnt-btn" data-cmd="insertOrderedList" title="Numbered list" aria-label="Numbered list" style="font-size:.7rem">1≡</button>
+        <div class="mnt-sep" role="separator"></div>
+        <button class="mnt-btn" data-cmd="formatBlock" data-val="h4" title="Heading" aria-label="Heading" style="font-size:.7rem;letter-spacing:.04em">H₄</button>
+        <button class="mnt-btn" data-cmd="formatBlock" data-val="p" title="Normal text" aria-label="Normal text">¶</button>
       </div>
-      <div class="mnote-ce" contenteditable="true" data-placeholder="Write a note…">${existing}</div>
+      <div class="mnote-ce" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" data-placeholder="Write a note…">${existing}</div>
       <div class="mnote-editor-actions">
         <button class="mne-save">Save</button>
         <button class="mne-cancel">Cancel</button>
-        ${existing ? '<button class="mne-delete">Delete</button>' : ''}
+        ${existingNote ? `<button class="mne-delete">Delete</button>` : ''}
       </div>
       <div class="mnote-editor-hint"><kbd>⌘ Enter</kbd> to save &middot; <kbd>Esc</kbd> to cancel</div>
     </div>`;
 
-  // Prepend editor to margin so it appears at top
   margin.insertBefore(wrap, margin.firstChild);
-  _activeEditor = { el: wrap, book, ch, v };
+  _activeEditor = { el: wrap, book, ch, v, noteId };
 
   const ce = wrap.querySelector('.mnote-ce');
   setTimeout(() => { ce.focus(); _placeCursorAtEnd(ce); }, 40);
@@ -2280,22 +2317,21 @@ function openInlineEditor(book, ch, v) {
   wrap.querySelectorAll('.mnt-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => {
       e.preventDefault();
-      const cmd = btn.dataset.cmd;
-      const val = btn.dataset.val || null;
-      document.execCommand(cmd, false, val);
+      document.execCommand(btn.dataset.cmd, false, btn.dataset.val || null);
       updateToolbarState(wrap);
       ce.focus();
     });
   });
-
   ce.addEventListener('keyup',   () => updateToolbarState(wrap));
   ce.addEventListener('mouseup', () => updateToolbarState(wrap));
 
-  wrap.querySelector('.mne-save').addEventListener('click', () => saveInlineNote(wrap, book, ch, v));
+  wrap.querySelector('.mne-save').addEventListener('click',   () => saveInlineNote(wrap, book, ch, v, noteId));
   wrap.querySelector('.mne-cancel').addEventListener('click', () => closeInlineEditor(true));
   const delBtn = wrap.querySelector('.mne-delete');
   if (delBtn) delBtn.addEventListener('click', () => {
-    delete NOTES[noteKey(book, ch, v)];
+    const k = noteKey(book, ch, v);
+    NOTES[k] = (NOTES[k] || []).filter(n => n.id != noteId);
+    if (!NOTES[k].length) delete NOTES[k];
     notesSave();
     closeInlineEditor(true);
     refreshNoteIndicators();
@@ -2304,7 +2340,7 @@ function openInlineEditor(book, ch, v) {
 
   ce.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeInlineEditor(true); e.stopPropagation(); }
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveInlineNote(wrap, book, ch, v); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveInlineNote(wrap, book, ch, v, noteId); }
   });
 }
 
@@ -2314,12 +2350,25 @@ function updateToolbarState(wrap) {
   });
 }
 
-function saveInlineNote(wrap, book, ch, v) {
+function saveInlineNote(wrap, book, ch, v, noteId) {
   const ce = wrap.querySelector('.mnote-ce');
   const html = ce.innerHTML.trim();
   const text = ce.innerText.trim();
-  if (text) { NOTES[noteKey(book, ch, v)] = html; }
-  else { delete NOTES[noteKey(book, ch, v)]; }
+  if (!text) { closeInlineEditor(true); return; }
+
+  const k = noteKey(book, ch, v);
+  if (!NOTES[k]) NOTES[k] = [];
+
+  if (noteId) {
+    // Edit existing
+    const idx = NOTES[k].findIndex(n => n.id == noteId);
+    if (idx >= 0) { NOTES[k][idx].html = html; NOTES[k][idx].ts = Date.now(); }
+    else { NOTES[k].push({ id: noteId, html, ts: Date.now() }); }
+  } else {
+    // New note
+    NOTES[k].push({ id: Date.now() + Math.random(), html, ts: Date.now() });
+  }
+
   notesSave();
   closeInlineEditor(true);
   if (typeof clearSelection === 'function') clearSelection();
@@ -2348,7 +2397,7 @@ document.getElementById('vabNote').addEventListener('click', () => {
   const v = vs[0];
   S.selectedVerses.clear();
   updateActionBar();
-  if (window.innerWidth >= 900) { openInlineEditor(S.book, S.chapter, v); }
+  if (window.innerWidth >= 900) { openInlineEditor(S.book, S.chapter, v, null); }
   else { openNoteModal(S.book, S.chapter, v); }
 });
 
@@ -2356,10 +2405,11 @@ document.getElementById('vabNote').addEventListener('click', () => {
 let _noteVerse = null;
 function openNoteModal(book, ch, v) {
   _noteVerse = {book, ch, v};
-  const existing = NOTES[noteKey(book, ch, v)] || '';
+  const arr = NOTES[noteKey(book, ch, v)] || [];
+  const existing = arr.length ? arr[arr.length-1].html.replace(/<[^>]+>/g,' ').trim() : '';
   document.getElementById('noteModalRef').textContent = `${book} ${ch}:${v}`;
-  document.getElementById('noteTextarea').value = existing.replace(/<[^>]+>/g,' ').trim();
-  document.getElementById('nmDelete').style.display = existing ? 'inline-flex' : 'none';
+  document.getElementById('noteTextarea').value = existing;
+  document.getElementById('nmDelete').style.display = arr.length ? 'inline-flex' : 'none';
   document.getElementById('noteModal').classList.add('open');
   setTimeout(() => document.getElementById('noteTextarea').focus(), 60);
 }
@@ -2371,7 +2421,11 @@ document.getElementById('nmSave').addEventListener('click', () => {
   if (!_noteVerse) return;
   const {book, ch, v} = _noteVerse;
   const text = document.getElementById('noteTextarea').value.trim();
-  if (text) { NOTES[noteKey(book, ch, v)] = text; } else { delete NOTES[noteKey(book, ch, v)]; }
+  const k = noteKey(book, ch, v);
+  if (text) {
+    if (!NOTES[k]) NOTES[k] = [];
+    NOTES[k].push({ id: Date.now(), html: text, ts: Date.now() });
+  }
   notesSave(); refreshNoteIndicators(); renderMarginNotes();
   if (typeof clearSelection === 'function') clearSelection();
   closeNoteModal();
@@ -2386,7 +2440,6 @@ document.getElementById('noteModal').addEventListener('click', e => {
 function refreshNoteIndicators() {
   document.querySelectorAll('.verse-line.has-note,.v-span.has-note')
     .forEach(el => { el.classList.remove('has-note'); el.style.removeProperty('--note-color'); });
-
   const sorted = getChapterNotesSorted(S.book, S.chapter);
   sorted.forEach((v, idx) => {
     const color = NOTE_COLORS[idx % NOTE_COLORS.length];
@@ -2395,50 +2448,85 @@ function refreshNoteIndicators() {
   });
 }
 
-// ── Margin notes render — normal flow, alternating margins ────
+// ── Margin notes render — sorted by verse, multi-note per verse ─
 function renderMarginNotes() {
   const left  = document.getElementById('leftMargin');
   const right = document.getElementById('rightMargin');
   if (!left || !right) return;
 
-  // On medium screens only right margin is visible — send all notes there
   const singleMargin = window.innerWidth < 1100 && window.innerWidth >= 720;
 
   [...left.children].forEach(c  => { if (!c.classList.contains('mnote-editor')) c.remove(); });
   [...right.children].forEach(c => { if (!c.classList.contains('mnote-editor')) c.remove(); });
 
+  // Get all verse numbers with notes, sorted ascending
   const sorted = getChapterNotesSorted(S.book, S.chapter);
   if (!sorted.length) return;
 
   sorted.forEach((v, i) => {
-    const html  = NOTES[noteKey(S.book, S.chapter, v)];
-    if (!html) return;
+    const noteArr = NOTES[noteKey(S.book, S.chapter, v)];
+    if (!noteArr || !noteArr.length) return;
 
     const isRight = singleMargin ? true : (i % 2 === 0);
     const margin  = isRight ? right : left;
     const color   = NOTE_COLORS[i % NOTE_COLORS.length];
 
-    const wrap = document.createElement('div');
-    wrap.className = 'mnote';
-    wrap.dataset.v = v;
-    wrap.style.setProperty('--note-color', color);
+    // Group wrapper for this verse
+    const group = document.createElement('div');
+    group.className = 'mnote-group';
+    group.dataset.v = v;
 
-    wrap.innerHTML = `
-      <div class="mnote-inner">
-        <div class="mnote-ref">
-          ${escNote(S.book)} ${S.chapter}:${v}
-          <button class="mnote-edit-btn" data-v="${v}">edit</button>
-        </div>
-        <div class="mnote-body">${html}</div>
-      </div>`;
+    // Each individual note
+    noteArr.forEach((note, ni) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'mnote';
+      wrap.dataset.v = v;
+      wrap.dataset.nid = note.id;
+      wrap.style.setProperty('--note-color', color);
 
-    wrap.querySelector('.mnote-body').addEventListener('click', () => wrap.classList.toggle('expanded'));
-    wrap.querySelector('.mnote-edit-btn').addEventListener('click', e => {
-      e.stopPropagation();
-      openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v));
+      // Only show verse ref on first note in group
+      const showRef = ni === 0;
+
+      wrap.innerHTML = `
+        <div class="mnote-inner">
+          ${showRef ? `<div class="mnote-ref">
+            <span>${escNote(S.book)} ${S.chapter}:${v}</span>
+            <span class="mnote-ref-actions">
+              <button class="mnote-add-btn" data-v="${v}" title="Add another note">+</button>
+              <button class="mnote-edit-btn" data-v="${v}" data-nid="${note.id}" title="Edit">edit</button>
+            </span>
+          </div>` : `<div class="mnote-continuation-rule"></div>`}
+          <div class="mnote-body">${note.html}</div>
+        </div>`;
+
+      wrap.querySelector('.mnote-body').addEventListener('click', () => wrap.classList.toggle('expanded'));
+      wrap.querySelector('.mnote-edit-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v), e.target.dataset.nid);
+      });
+      wrap.querySelector('.mnote-add-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v), null);
+      });
+
+      group.appendChild(wrap);
     });
 
-    margin.appendChild(wrap);
+    // If only one note shown and there's no add button at bottom, add it for subsequent notes
+    if (noteArr.length > 0) {
+      // Add note button at bottom of group (always visible on hover)
+      const addWrap = document.createElement('div');
+      addWrap.className = 'mnote-add-row';
+      addWrap.style.setProperty('--note-color', color);
+      addWrap.innerHTML = `<button class="mnote-add-row-btn" data-v="${v}">+ add note</button>`;
+      addWrap.querySelector('button').addEventListener('click', e => {
+        e.stopPropagation();
+        openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v), null);
+      });
+      group.appendChild(addWrap);
+    }
+
+    margin.appendChild(group);
   });
 }
 
@@ -2452,7 +2540,6 @@ new MutationObserver(() => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeInlineEditor(true);
 });
-
 
 </script>
 
