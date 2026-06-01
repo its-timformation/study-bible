@@ -375,30 +375,137 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 
 /* ══ STUDY BIBLE — DESKTOP MARGIN LAYOUT ══════════════════════ */
 @media(min-width:900px){
-  #studyLayout{display:grid;grid-template-columns:220px 1fr 220px;min-height:calc(100vh - 52px);max-width:1440px;margin:0 auto;align-items:start;}
-  #leftMargin,#rightMargin{position:sticky;top:calc(var(--bar-h) + var(--sat) + 16px);max-height:calc(100vh - var(--bar-h) - var(--sat) - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:0 12px 40px;}
-  #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
-  #leftMargin{border-right:1px solid var(--col-rule);}
-  #rightMargin{border-left:1px solid var(--col-rule);}
+  #studyLayout{display:grid;grid-template-columns:228px 1fr 228px;min-height:calc(100vh - 52px);max-width:1480px;margin:0 auto;align-items:start;}
+  #leftMargin,#rightMargin{position:relative;padding:0 0 80px;}
+  #leftMargin{border-right:1px solid var(--col-rule);padding-right:0;}
+  #rightMargin{border-left:1px solid var(--col-rule);padding-left:0;}
   #studyPageCol{min-width:0;}
 }
 @media(max-width:899px){
   #leftMargin,#rightMargin{display:none;}
   #studyLayout{display:block;}
 }
-/* Margin note cards */
-.mnote{background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin-bottom:12px;cursor:pointer;transition:border-color .15s;font-size:.8rem;line-height:1.55;position:relative;}
-.mnote:hover{border-color:var(--text-muted);}
-.mnote-ref{font-family:var(--sc);font-size:.62rem;letter-spacing:.18em;color:var(--hi);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;}
-.mnote-edit-btn{background:none;border:none;font-size:.7rem;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .12s;padding:0;font-family:var(--sans);letter-spacing:.06em;}
-.mnote:hover .mnote-edit-btn{opacity:1;}
-.mnote-body{color:var(--text-soft);font-family:var(--sans);font-weight:300;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
-/* Dashed underline on verses that have a note */
+
+/* ── Connector SVG canvas ── */
+#noteConnectors{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible;}
+
+/* ── Verse note indicator ── */
 .verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--col-rule);}
 [data-theme="night"] .verse-line.has-note,[data-theme="night"] .v-span.has-note{border-bottom-color:#3A3028;}
 [data-theme="sepia"] .verse-line.has-note,[data-theme="sepia"] .v-span.has-note{border-bottom-color:#C0A888;}
-/* Note modal extras */
+
+/* ── Margin note — unboxed inline style ── */
+.mnote{
+  position:absolute;
+  left:0; right:0;
+  padding:0 16px 0 20px;
+  cursor:default;
+}
+.mnote-inner{
+  border-left:2px solid var(--col-rule);
+  padding-left:10px;
+  transition:border-color .2s;
+}
+.mnote:hover .mnote-inner,.mnote.active .mnote-inner{border-left-color:var(--hi);}
+.mnote-ref{
+  font-family:var(--sc);
+  font-size:.58rem;
+  letter-spacing:.2em;
+  color:var(--hi);
+  margin-bottom:3px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  opacity:.7;
+}
+.mnote-edit-btn{
+  background:none;border:none;
+  font-family:var(--sans);font-size:.6rem;font-weight:400;
+  letter-spacing:.08em;color:var(--text-muted);
+  cursor:pointer;opacity:0;transition:opacity .15s;padding:0;
+}
+.mnote:hover .mnote-edit-btn{opacity:1;}
+.mnote-body{
+  font-family:var(--serif);
+  font-size:.82rem;
+  font-style:italic;
+  color:var(--text-soft);
+  line-height:1.6;
+  cursor:pointer;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
+
+/* ── Inline margin editor ── */
+.mnote-editor{
+  position:absolute;
+  left:0;right:0;
+  padding:0 12px 0 20px;
+  z-index:10;
+}
+.mnote-editor-inner{
+  border-left:2px solid var(--hi);
+  padding-left:10px;
+}
+.mnote-editor-ref{
+  font-family:var(--sc);font-size:.58rem;letter-spacing:.2em;
+  color:var(--hi);margin-bottom:6px;
+}
+.mnote-ce{
+  min-height:60px;
+  font-family:var(--serif);font-style:italic;
+  font-size:.82rem;line-height:1.6;
+  color:var(--text);
+  outline:none;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.mnote-ce:empty::before{
+  content:attr(data-placeholder);
+  color:var(--text-muted);
+  pointer-events:none;
+}
+.mnote-editor-actions{
+  display:flex;align-items:center;gap:8px;
+  margin-top:8px;padding-top:6px;
+  border-top:1px solid var(--border);
+}
+.mne-save{
+  background:none;border:none;
+  font-family:var(--sans);font-size:.6rem;font-weight:400;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--hi);cursor:pointer;padding:4px 0;
+  transition:opacity .15s;
+}
+.mne-save:hover{opacity:.7;}
+.mne-cancel{
+  background:none;border:none;
+  font-family:var(--sans);font-size:.6rem;font-weight:300;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-muted);cursor:pointer;padding:4px 0;
+  transition:color .15s;
+}
+.mne-cancel:hover{color:var(--text);}
+.mne-delete{
+  margin-left:auto;
+  background:none;border:none;
+  font-family:var(--sans);font-size:.6rem;font-weight:300;
+  letter-spacing:.1em;
+  color:var(--text-muted);cursor:pointer;padding:4px 0;
+  transition:color .15s;opacity:.6;
+}
+.mne-delete:hover{color:#964040;opacity:1;}
+
+/* ── Connector line SVG ── */
+.note-connector{stroke:var(--col-rule);stroke-width:1;fill:none;opacity:.6;}
+[data-theme="night"] .note-connector{stroke:#3A3028;}
+[data-theme="sepia"] .note-connector{stroke:#C8B090;}
+
+/* ── Note modal (keep for mobile fallback, hidden on desktop) ── */
+@media(min-width:900px){#noteModal{display:none!important;}}
 #noteModalRef{font-family:var(--sc);font-size:.68rem;letter-spacing:.16em;color:var(--hi);margin-left:auto;margin-right:12px;}
 #noteTextarea{width:100%;background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:12px 14px;font-family:var(--sans);font-size:.875rem;font-weight:300;line-height:1.65;color:var(--text);resize:vertical;min-height:120px;outline:none;transition:border-color .15s;}
 #noteTextarea:focus{border-color:var(--text-muted);}
@@ -490,7 +597,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 <div class="comp-tab-strip" id="compTabStrip"><div class="comp-tab-strip-inner" id="compTabInner"></div></div>
 
 <div id="studyLayout">
-  <aside id="leftMargin"></aside>
+  <aside id="leftMargin"><svg id="noteConnectorsL" class="note-connectors-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg></aside>
   <div id="studyPageCol">
     <div class="page">
       <div id="readingSurface" class="reading-surface"><div class="status-msg">A quiet place to read.</div></div>
@@ -500,7 +607,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
       </nav>
     </div>
   </div>
-  <aside id="rightMargin"></aside>
+  <aside id="rightMargin"><svg id="noteConnectorsR" class="note-connectors-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg></aside>
 </div>
 
 <!-- Verse action bar -->
@@ -654,7 +761,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.0</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.1</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2038,7 +2145,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   render(true);
 });
 
-// ══ STUDY NOTES SYSTEM ════════════════════════════════════════
+// ══ STUDY NOTES SYSTEM v2 ═════════════════════════════════════
 
 const NOTES_KEY = 'study-bible-notes';
 function notesLoad(){try{return JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');}catch(e){return{};}}
@@ -2046,107 +2153,279 @@ function notesSave(){localStorage.setItem(NOTES_KEY,JSON.stringify(NOTES));}
 function noteKey(book,ch,v){return`${book}|${ch}|${v}`;}
 const NOTES = notesLoad();
 
-// ── Note modal ────────────────────────────────────────────────
-let _noteVerse = null;
-
-function openNoteModal(book,ch,v){
-  _noteVerse={book,ch,v};
-  const existing=NOTES[noteKey(book,ch,v)]||'';
-  document.getElementById('noteModalRef').textContent=`${book} ${ch}:${v}`;
-  document.getElementById('noteTextarea').value=existing;
-  document.getElementById('nmDelete').style.display=existing?'inline-flex':'none';
-  document.getElementById('noteModal').classList.add('open');
-  setTimeout(()=>document.getElementById('noteTextarea').focus(),60);
-}
-function closeNoteModal(){
-  document.getElementById('noteModal').classList.remove('open');
-  _noteVerse=null;
+function escNote(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-document.getElementById('nmSave').addEventListener('click',()=>{
-  if(!_noteVerse)return;
-  const{book,ch,v}=_noteVerse;
-  const text=document.getElementById('noteTextarea').value.trim();
-  if(text){NOTES[noteKey(book,ch,v)]=text;}else{delete NOTES[noteKey(book,ch,v)];}
-  notesSave();
-  refreshNoteIndicators();
-  renderMarginNotes();
-  closeNoteModal();
-});
-document.getElementById('nmDelete').addEventListener('click',()=>{
-  if(!_noteVerse)return;
-  const{book,ch,v}=_noteVerse;
-  delete NOTES[noteKey(book,ch,v)];
-  notesSave();
-  refreshNoteIndicators();
-  renderMarginNotes();
-  closeNoteModal();
-});
-document.getElementById('nmCancel').addEventListener('click',closeNoteModal);
-document.getElementById('closeNoteModal').addEventListener('click',closeNoteModal);
-document.getElementById('noteModal').addEventListener('click',e=>{if(e.target===document.getElementById('noteModal'))closeNoteModal();});
+// ── Inline margin editor ───────────────────────────────────────
+let _activeEditor = null; // { el, book, ch, v }
 
-// ── Note button in verse action bar ──────────────────────────
-document.getElementById('vabNote').addEventListener('click',()=>{
-  const vs=[...S.selectedVerses];
-  if(!vs.length)return;
-  const v=vs[0];
-  openNoteModal(S.book,S.chapter,v);
+function openInlineEditor(book, ch, v) {
+  closeInlineEditor(false);
+
+  const isRight = _noteIsRight(book, ch, v);
+  const margin = document.getElementById(isRight ? 'rightMargin' : 'leftMargin');
+  if (!margin) { openNoteModal(book, ch, v); return; }
+
+  const existing = NOTES[noteKey(book, ch, v)] || '';
+
+  // Position editor at verse top
+  const verseEl = _getVerseEl(v);
+  const topPx = verseEl ? _verseTopInLayout(verseEl) : 40;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'mnote-editor';
+  wrap.style.top = topPx + 'px';
+
+  wrap.innerHTML = `
+    <div class="mnote-editor-inner">
+      <div class="mnote-editor-ref">${escNote(book)} ${ch}:${v}</div>
+      <div class="mnote-ce" contenteditable="true" data-placeholder="Write a note…">${escNote(existing)}</div>
+      <div class="mnote-editor-actions">
+        <button class="mne-save">Save</button>
+        <button class="mne-cancel">Cancel</button>
+        ${existing ? '<button class="mne-delete">Delete</button>' : ''}
+      </div>
+    </div>`;
+
+  margin.appendChild(wrap);
+  _activeEditor = { el: wrap, book, ch, v };
+
+  const ce = wrap.querySelector('.mnote-ce');
+  setTimeout(() => { ce.focus(); _placeCursorAtEnd(ce); }, 40);
+
+  wrap.querySelector('.mne-save').addEventListener('click', () => saveInlineNote(wrap, book, ch, v));
+  wrap.querySelector('.mne-cancel').addEventListener('click', () => closeInlineEditor(true));
+  const delBtn = wrap.querySelector('.mne-delete');
+  if (delBtn) delBtn.addEventListener('click', () => {
+    delete NOTES[noteKey(book, ch, v)];
+    notesSave();
+    closeInlineEditor(true);
+    refreshNoteIndicators();
+    renderMarginNotes();
+  });
+
+  ce.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeInlineEditor(true); e.stopPropagation(); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveInlineNote(wrap, book, ch, v);
+  });
+}
+
+function saveInlineNote(wrap, book, ch, v) {
+  const ce = wrap.querySelector('.mnote-ce');
+  const text = ce.innerText.trim();
+  if (text) { NOTES[noteKey(book, ch, v)] = text; }
+  else { delete NOTES[noteKey(book, ch, v)]; }
+  notesSave();
+  closeInlineEditor(true);
+  refreshNoteIndicators();
+  renderMarginNotes();
+}
+
+function closeInlineEditor(rerender) {
+  if (_activeEditor) {
+    _activeEditor.el.remove();
+    _activeEditor = null;
+  }
+  if (rerender) renderMarginNotes();
+}
+
+function _placeCursorAtEnd(el) {
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+// ── Note button in verse action bar ───────────────────────────
+document.getElementById('vabNote').addEventListener('click', () => {
+  const vs = [...S.selectedVerses];
+  if (!vs.length) return;
+  const v = vs[0];
   S.selectedVerses.clear();
   updateActionBar();
+  // On desktop open inline, on mobile open modal
+  if (window.innerWidth >= 900) {
+    openInlineEditor(S.book, S.chapter, v);
+  } else {
+    openNoteModal(S.book, S.chapter, v);
+  }
 });
 
-// ── Verse indicators (dashed underline) ──────────────────────
-function refreshNoteIndicators(){
+// ── Modal (mobile fallback) ────────────────────────────────────
+let _noteVerse = null;
+function openNoteModal(book, ch, v) {
+  _noteVerse = {book, ch, v};
+  const existing = NOTES[noteKey(book, ch, v)] || '';
+  document.getElementById('noteModalRef').textContent = `${book} ${ch}:${v}`;
+  document.getElementById('noteTextarea').value = existing;
+  document.getElementById('nmDelete').style.display = existing ? 'inline-flex' : 'none';
+  document.getElementById('noteModal').classList.add('open');
+  setTimeout(() => document.getElementById('noteTextarea').focus(), 60);
+}
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('open');
+  _noteVerse = null;
+}
+document.getElementById('nmSave').addEventListener('click', () => {
+  if (!_noteVerse) return;
+  const {book, ch, v} = _noteVerse;
+  const text = document.getElementById('noteTextarea').value.trim();
+  if (text) { NOTES[noteKey(book, ch, v)] = text; } else { delete NOTES[noteKey(book, ch, v)]; }
+  notesSave(); refreshNoteIndicators(); renderMarginNotes(); closeNoteModal();
+});
+document.getElementById('nmDelete').addEventListener('click', () => {
+  if (!_noteVerse) return;
+  const {book, ch, v} = _noteVerse;
+  delete NOTES[noteKey(book, ch, v)];
+  notesSave(); refreshNoteIndicators(); renderMarginNotes(); closeNoteModal();
+});
+document.getElementById('nmCancel').addEventListener('click', closeNoteModal);
+document.getElementById('closeNoteModal').addEventListener('click', closeNoteModal);
+document.getElementById('noteModal').addEventListener('click', e => { if (e.target === document.getElementById('noteModal')) closeNoteModal(); });
+
+// ── Verse indicators ───────────────────────────────────────────
+function refreshNoteIndicators() {
   document.querySelectorAll('.verse-line.has-note,.v-span.has-note')
-    .forEach(el=>el.classList.remove('has-note'));
-  Object.keys(NOTES).forEach(key=>{
-    const[book,ch,v]=key.split('|');
-    if(book===S.book&&parseInt(ch)===S.chapter){
+    .forEach(el => el.classList.remove('has-note'));
+  Object.keys(NOTES).forEach(key => {
+    const [book, ch, v] = key.split('|');
+    if (book === S.book && parseInt(ch) === S.chapter) {
       document.querySelectorAll(`.verse-line[data-v="${v}"],.v-span[data-v="${v}"]`)
-        .forEach(el=>el.classList.add('has-note'));
+        .forEach(el => el.classList.add('has-note'));
     }
   });
 }
 
-// ── Margin note cards ─────────────────────────────────────────
-function escNote(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── Layout helpers ─────────────────────────────────────────────
+function _getVerseEl(v) {
+  return document.querySelector(`.verse-line[data-v="${v}"],.v-span[data-v="${v}"]`);
 }
-function renderMarginNotes(){
-  const left=document.getElementById('leftMargin');
-  const right=document.getElementById('rightMargin');
-  if(!left||!right)return;
-  left.innerHTML='';right.innerHTML='';
-  const chNotes=Object.entries(NOTES)
-    .filter(([key])=>{const[book,ch]=key.split('|');return book===S.book&&parseInt(ch)===S.chapter;})
-    .map(([key,text])=>{const[,,v]=key.split('|');return{v:parseInt(v),text};})
-    .sort((a,b)=>a.v-b.v);
-  if(!chNotes.length)return;
-  chNotes.forEach((note,i)=>{
-    const card=document.createElement('div');
-    card.className='mnote';
-    card.innerHTML=`<div class="mnote-ref">${escNote(S.book)} ${S.chapter}:${note.v}<button class="mnote-edit-btn" data-v="${note.v}">edit</button></div><div class="mnote-body">${escNote(note.text)}</div>`;
-    card.addEventListener('click',e=>{
-      const btn=e.target.closest('.mnote-edit-btn');
-      if(btn){openNoteModal(S.book,S.chapter,parseInt(btn.dataset.v));return;}
-      card.classList.toggle('expanded');
+
+function _verseTopInLayout(verseEl) {
+  // Top of verseEl relative to #studyLayout
+  const layout = document.getElementById('studyLayout');
+  if (!layout) return 0;
+  const vRect = verseEl.getBoundingClientRect();
+  const lRect = layout.getBoundingClientRect();
+  return vRect.top - lRect.top + layout.scrollTop;
+}
+
+// Which margin side gets note i? right=even, left=odd
+function _noteIsRight(book, ch, v) {
+  const chNotes = Object.keys(NOTES)
+    .filter(k => { const[b,c]=k.split('|'); return b===book&&parseInt(c)===ch; })
+    .map(k => parseInt(k.split('|')[2]))
+    .sort((a,b)=>a-b);
+  const idx = chNotes.indexOf(parseInt(v));
+  return idx % 2 === 0;
+}
+
+// ── Margin notes render ────────────────────────────────────────
+function renderMarginNotes() {
+  const left  = document.getElementById('leftMargin');
+  const right = document.getElementById('rightMargin');
+  if (!left || !right) return;
+
+  // Clear notes but keep SVG canvases
+  [...left.children].forEach(c => { if (!c.classList.contains('note-connectors-svg') && c.tagName !== 'svg') c.remove(); });
+  [...right.children].forEach(c => { if (!c.classList.contains('note-connectors-svg') && c.tagName !== 'svg') c.remove(); });
+  const svgL = document.getElementById('noteConnectorsL');
+  const svgR = document.getElementById('noteConnectorsR');
+  if (svgL) svgL.innerHTML = '';
+  if (svgR) svgR.innerHTML = '';
+
+  const chNotes = Object.entries(NOTES)
+    .filter(([key]) => { const[book,ch]=key.split('|'); return book===S.book&&parseInt(ch)===S.chapter; })
+    .map(([key, text]) => { const[,,v]=key.split('|'); return {v: parseInt(v), text}; })
+    .sort((a,b) => a.v - b.v);
+
+  if (!chNotes.length) return;
+
+  // We need to wait for layout before measuring verse positions
+  requestAnimationFrame(() => {
+    const layout = document.getElementById('studyLayout');
+    if (!layout) return;
+    const lRect = layout.getBoundingClientRect();
+
+    chNotes.forEach((note, i) => {
+      const isRight = i % 2 === 0;
+      const margin  = isRight ? right : left;
+      const svg     = isRight ? svgR  : svgL;
+
+      const verseEl = _getVerseEl(note.v);
+      const topPx   = verseEl ? (() => {
+        const vRect = verseEl.getBoundingClientRect();
+        return vRect.top - lRect.top + window.scrollY;
+      })() : (i * 80 + 40);
+
+      // Note element
+      const wrap = document.createElement('div');
+      wrap.className = 'mnote';
+      wrap.dataset.v = note.v;
+      wrap.style.top = topPx + 'px';
+      wrap.innerHTML = `
+        <div class="mnote-inner">
+          <div class="mnote-ref">
+            ${escNote(S.book)} ${S.chapter}:${note.v}
+            <button class="mnote-edit-btn" data-v="${note.v}">edit</button>
+          </div>
+          <div class="mnote-body">${escNote(note.text)}</div>
+        </div>`;
+
+      wrap.querySelector('.mnote-body').addEventListener('click', () => wrap.classList.toggle('expanded'));
+      wrap.querySelector('.mnote-edit-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        openInlineEditor(S.book, S.chapter, parseInt(e.target.dataset.v));
+      });
+
+      margin.appendChild(wrap);
+
+      // Connector line
+      if (svg && verseEl) {
+        requestAnimationFrame(() => {
+          const marginRect = margin.getBoundingClientRect();
+          const vRect      = verseEl.getBoundingClientRect();
+          const wRect      = wrap.getBoundingClientRect();
+
+          // Verse anchor: centre-right or centre-left of verse el
+          const verseAnchorX = isRight
+            ? vRect.right  - marginRect.left + (isRight ? 0 : margin.offsetWidth)
+            : vRect.left   - marginRect.left;
+          const verseAnchorY = vRect.top + vRect.height / 2 - marginRect.top;
+
+          // Note anchor: left or right edge of note
+          const noteAnchorX = isRight ? 20 : margin.offsetWidth - 20;
+          const noteAnchorY = wRect.top + 10 - marginRect.top;
+
+          // Bezier curve
+          const cx1 = isRight ? verseAnchorX + 20 : verseAnchorX - 20;
+          const cx2 = isRight ? noteAnchorX  - 20 : noteAnchorX  + 20;
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+          path.setAttribute('class','note-connector');
+          path.setAttribute('d',`M ${verseAnchorX} ${verseAnchorY} C ${cx1} ${verseAnchorY}, ${cx2} ${noteAnchorY}, ${noteAnchorX} ${noteAnchorY}`);
+          svg.appendChild(path);
+        });
+      }
     });
-    (i%2===0?right:left).appendChild(card);
   });
 }
 
-// ── Hook into render — observe readingSurface for changes ─────
-new MutationObserver(()=>{
+// ── Hook into render cycle ─────────────────────────────────────
+new MutationObserver(() => {
+  closeInlineEditor(false);
   refreshNoteIndicators();
   renderMarginNotes();
-}).observe(document.getElementById('readingSurface'),{childList:true,subtree:false});
+}).observe(document.getElementById('readingSurface'), {childList: true, subtree: false});
 
-// ── Escape closes note modal ──────────────────────────────────
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('noteModal').classList.contains('open')){
-    closeNoteModal();e.stopPropagation();
-  }
+window.addEventListener('scroll', () => renderMarginNotes(), {passive: true});
+window.addEventListener('resize', () => renderMarginNotes(), {passive: true});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInlineEditor(true);
 });
 </script>
 
