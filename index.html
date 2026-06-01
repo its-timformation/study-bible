@@ -64,7 +64,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .top-mid{display:flex;align-items:center;justify-content:center;}
 .top-right{display:flex;align-items:center;justify-content:flex-end;gap:4px;}
 .top-wordmark{font-family:var(--display);font-weight:400;font-style:italic;font-size:1.15rem;letter-spacing:.04em;color:var(--hi);user-select:none;display:inline-flex;align-items:center;gap:7px;}
-.top-wordmark-pill{display:inline-block;background:var(--text);color:var(--bg);font-family:var(--sans);font-style:normal;font-weight:500;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:20px;line-height:1;vertical-align:middle;position:relative;top:-1px;}
+.top-wordmark-pill{display:inline-flex;align-items:center;background:var(--text);color:var(--bg);font-family:var(--sans);font-style:normal;font-weight:500;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px;line-height:1;}
 .top-wordmark-right{display:none;}
 .top-ref{display:flex;align-items:center;gap:5px;cursor:pointer;padding:0 10px;height:30px;border-radius:15px;border:1px solid var(--border);background:var(--bg-sub);transition:border-color .2s;user-select:none;min-width:0;max-width:100%;}
 .top-ref:hover{border-color:var(--text-muted);}
@@ -376,32 +376,67 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .bottom-tab-bar{display:none;}
 
 /* ══ STUDY BIBLE — DESKTOP MARGIN LAYOUT ══════════════════════ */
-@media(min-width:900px){
-  #studyLayout{display:grid;grid-template-columns:240px 1fr 240px;min-height:calc(100vh - 52px);max-width:1480px;margin:0 auto;align-items:start;}
+
+/* ── Full-width layout: flex so sticky children honour their width ── */
+@media(min-width:1100px){
+  #studyLayout{
+    display:flex;
+    align-items:flex-start;
+    min-height:calc(100vh - 52px);
+    max-width:1520px;
+    margin:0 auto;
+  }
   #leftMargin,#rightMargin{
-    width:240px;
+    flex:0 0 220px;
+    width:220px;
+    min-width:220px;
     position:sticky;
     top:52px;
-    max-height:calc(100vh - 52px);
+    height:calc(100vh - 52px);
     overflow-y:auto;
     overflow-x:hidden;
     scrollbar-width:none;
-    padding:32px 0 80px;
+    padding:28px 0 80px;
     display:flex;
     flex-direction:column;
-    gap:24px;
+    gap:20px;
     box-sizing:border-box;
-    flex-shrink:0;
-    flex-grow:0;
   }
   #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
   #leftMargin{border-right:1px solid var(--col-rule);}
   #rightMargin{border-left:1px solid var(--col-rule);}
-  #studyPageCol{min-width:0;width:100%;}
-  /* Tighten reading surface padding on desktop */
-  .reading-surface{padding:0 16px !important;}
+  #studyPageCol{flex:1 1 0;min-width:0;}
+  .reading-surface{padding:0 12px !important;}
 }
-@media(max-width:899px){
+
+/* ── Medium: one margin (right only, notes all right) ── */
+@media(min-width:720px) and (max-width:1099px){
+  #studyLayout{display:flex;align-items:flex-start;}
+  #leftMargin{display:none;}
+  #rightMargin{
+    flex:0 0 200px;
+    width:200px;
+    min-width:200px;
+    position:sticky;
+    top:52px;
+    height:calc(100vh - 52px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:none;
+    padding:28px 0 80px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    box-sizing:border-box;
+    border-left:1px solid var(--col-rule);
+  }
+  #rightMargin::-webkit-scrollbar{display:none;}
+  #studyPageCol{flex:1 1 0;min-width:0;}
+  .reading-surface{padding:0 12px !important;}
+}
+
+/* ── Small: no margins ── */
+@media(max-width:719px){
   #leftMargin,#rightMargin{display:none;}
   #studyLayout{display:block;}
 }
@@ -409,27 +444,27 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 :root{ --note-color: #B8722E; }
 /* ── Verse note indicator — coloured dashed underline ── */
 .verse-line.has-note,.v-span.has-note{border-bottom:1.5px dashed var(--note-color);}
-/* ── Margin note — normal flow, full width ── */
-.mnote{width:100%;box-sizing:border-box;padding:0;cursor:default;}
-.mnote-inner{border-left:2.5px solid var(--note-color);padding:4px 16px 6px 12px;transition:opacity .2s;}
+/* ── Margin note — flush to column edges ── */
+.mnote{width:100%;box-sizing:border-box;cursor:default;}
+.mnote-inner{border-left:2.5px solid var(--note-color);padding:5px 12px 6px 10px;transition:opacity .2s;}
 .mnote:hover .mnote-inner{opacity:.8;}
 .mnote-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;opacity:.8;}
-.mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:0;}
+.mnote-edit-btn{background:none;border:none;font-family:var(--sans);font-size:.58rem;font-weight:400;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:2px 0;min-height:24px;}
 .mnote:hover .mnote-edit-btn{opacity:1;}
-.mnote-body{font-family:var(--serif);font-size:.8rem;font-style:italic;color:var(--text-soft);line-height:1.55;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.mnote-body{font-family:var(--serif);font-size:.79rem;font-style:italic;color:var(--text-soft);line-height:1.5;cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .mnote.expanded .mnote-body{-webkit-line-clamp:unset;overflow:visible;}
-/* ── Inline margin editor — full width ── */
-.mnote-editor{width:100%;box-sizing:border-box;padding:0;z-index:10;}
-.mnote-editor-inner{border-left:2.5px solid var(--note-color);padding:6px 16px 10px 12px;background:var(--bg);}
-.mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:6px;opacity:.8;}
-/* Rich text toolbar */
-.mnote-toolbar{display:flex;align-items:center;gap:1px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.mnt-btn{width:22px;height:22px;background:none;border:none;border-radius:3px;font-size:.72rem;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;padding:0;line-height:1;}
-.mnt-btn:hover{background:var(--bg-sub);color:var(--text);}
-.mnt-btn.active{background:var(--bg-sub);color:var(--note-color);}
-.mnt-btn s{text-decoration:line-through;font-size:.72rem;}
-.mnt-btn mark{background:rgba(255,220,0,.35);color:inherit;font-size:.72rem;padding:0 1px;}
-.mnt-sep{width:1px;height:14px;background:var(--border);margin:0 3px;flex-shrink:0;}
+/* ── Inline margin editor — flush, full width ── */
+.mnote-editor{width:100%;box-sizing:border-box;z-index:10;}
+.mnote-editor-inner{border-left:2.5px solid var(--note-color);padding:6px 12px 10px 10px;background:var(--bg);}
+.mnote-editor-ref{font-family:var(--sc);font-size:.56rem;letter-spacing:.2em;color:var(--note-color);margin-bottom:8px;opacity:.8;}
+/* Rich text toolbar — larger, accessible hit targets */
+.mnote-toolbar{display:flex;align-items:center;gap:2px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.mnt-btn{width:28px;height:28px;background:none;border:1px solid transparent;border-radius:4px;font-size:.78rem;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s,border-color .12s;padding:0;line-height:1;}
+.mnt-btn:hover{background:var(--bg-sub);color:var(--text);border-color:var(--border);}
+.mnt-btn.active{background:var(--bg-sub);color:var(--note-color);border-color:var(--note-color);}
+.mnt-btn s{text-decoration:line-through;font-size:.78rem;}
+.mnt-btn mark{background:rgba(255,220,0,.45);color:var(--text);font-size:.78rem;padding:0 1px;}
+.mnt-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0;}
 .mnote-ce{min-height:56px;font-family:var(--serif);font-style:italic;font-size:.8rem;line-height:1.55;color:var(--text);outline:none;word-break:break-word;}
 .mnote-ce:empty::before{content:attr(data-placeholder);color:var(--text-muted);pointer-events:none;font-style:italic;}
 .mnote-ce b{font-weight:600;font-style:normal;}.mnote-ce u{text-underline-offset:2px;}
@@ -714,7 +749,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.8</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.9</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2165,7 +2200,8 @@ function openInlineEditor(book, ch, v) {
   })();
   const color = NOTE_COLORS[colorIdx % NOTE_COLORS.length];
 
-  const isRight = colorIdx % 2 === 0;
+  const singleMargin = window.innerWidth < 1100 && window.innerWidth >= 720;
+  const isRight = singleMargin ? true : (colorIdx % 2 === 0);
   const margin = document.getElementById(isRight ? 'rightMargin' : 'leftMargin');
   if (!margin) { openNoteModal(book, ch, v); return; }
 
@@ -2333,7 +2369,9 @@ function renderMarginNotes() {
   const right = document.getElementById('rightMargin');
   if (!left || !right) return;
 
-  // Clear existing note cards
+  // On medium screens only right margin is visible — send all notes there
+  const singleMargin = window.innerWidth < 1100 && window.innerWidth >= 720;
+
   [...left.children].forEach(c  => { if (!c.classList.contains('mnote-editor')) c.remove(); });
   [...right.children].forEach(c => { if (!c.classList.contains('mnote-editor')) c.remove(); });
 
@@ -2344,7 +2382,7 @@ function renderMarginNotes() {
     const html  = NOTES[noteKey(S.book, S.chapter, v)];
     if (!html) return;
 
-    const isRight = i % 2 === 0;
+    const isRight = singleMargin ? true : (i % 2 === 0);
     const margin  = isRight ? right : left;
     const color   = NOTE_COLORS[i % NOTE_COLORS.length];
 
