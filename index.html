@@ -182,6 +182,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 .vab-btn svg{width:15px;height:15px;}
 .vab-clear{margin-left:auto;border:none;padding:0 8px;color:var(--text-muted);}
 .vab-clear:hover{background:transparent;color:var(--text);}
+.vab-key{display:inline-flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:.5rem;font-weight:400;letter-spacing:.04em;background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:1px 4px;margin-left:5px;color:var(--text-muted);line-height:1.4;flex-shrink:0;}
 
 /* ── Toast ── */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);font-family:var(--sans);font-size:.72rem;font-weight:400;letter-spacing:.1em;padding:9px 20px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:350;}
@@ -376,11 +377,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 
 /* ══ STUDY BIBLE — DESKTOP MARGIN LAYOUT ══════════════════════ */
 @media(min-width:900px){
-  #studyLayout{display:grid;grid-template-columns:256px 1fr 256px;min-height:calc(100vh - 52px);max-width:1520px;margin:0 auto;align-items:start;}
+  #studyLayout{display:grid;grid-template-columns:240px 1fr 240px;min-height:calc(100vh - 52px);max-width:1480px;margin:0 auto;align-items:start;}
   #leftMargin,#rightMargin{
+    width:240px;
     position:sticky;
     top:52px;
-    width:256px;
     max-height:calc(100vh - 52px);
     overflow-y:auto;
     overflow-x:hidden;
@@ -390,11 +391,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
     flex-direction:column;
     gap:24px;
     box-sizing:border-box;
+    flex-shrink:0;
+    flex-grow:0;
   }
   #leftMargin::-webkit-scrollbar,#rightMargin::-webkit-scrollbar{display:none;}
   #leftMargin{border-right:1px solid var(--col-rule);}
   #rightMargin{border-left:1px solid var(--col-rule);}
-  #studyPageCol{min-width:0;}
+  #studyPageCol{min-width:0;width:100%;}
+  /* Tighten reading surface padding on desktop */
+  .reading-surface{padding:0 16px !important;}
 }
 @media(max-width:899px){
   #leftMargin,#rightMargin{display:none;}
@@ -574,10 +579,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   </div>
   <!-- Row 2: save, copy, note, close -->
   <div class="vab-row2">
-    <button class="vab-btn" id="vabBookmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save</button>
-    <button class="vab-btn" id="vabCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
-    <button class="vab-btn" id="vabNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8l6-6V4a2 2 0 0 0-2-2z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Note</button>
-    <button class="vab-btn vab-clear" id="vabClear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear</button>
+    <button class="vab-btn" id="vabBookmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save<span class="vab-key">S</span></button>
+    <button class="vab-btn" id="vabCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy<span class="vab-key">C</span></button>
+    <button class="vab-btn" id="vabNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8l6-6V4a2 2 0 0 0-2-2z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Note<span class="vab-key">N</span></button>
+    <button class="vab-btn vab-clear" id="vabClear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear<span class="vab-key">Esc</span></button>
   </div>
 </div>
 
@@ -709,7 +714,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   <div class="modal-card wide">
     <div class="modal-title"><span>App Info &amp; Translation Keys</span><button class="modal-close" id="closeAppInfoModal">Close ×</button></div>
     <div class="modal-sec">
-      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.6</span></div>
+      <div class="appinfo-row"><span>Version</span><span class="appinfo-val" id="appVersion">1.0.7</span></div>
       <div class="appinfo-row"><span>Last updated</span><span class="appinfo-val" id="appDate">June 2026</span></div>
       <div class="appinfo-row"><span>Built with</span><span class="appinfo-val">bible-api.com · api.esv.org · rest.api.bible</span></div>
     </div>
@@ -2017,13 +2022,21 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName))return;
     if(e.target.isContentEditable)return;
     if(e.key==='/')  {e.preventDefault();openSearch();}
-    // N key — open note for first selected verse
-    if(e.key==='n'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
-      if(S.selectedVerses&&S.selectedVerses.size>0){
+    // Action bar shortcuts — only when verses selected
+    if(S.selectedVerses&&S.selectedVerses.size>0){
+      if(e.key==='n'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
         e.preventDefault();
         const v=[...S.selectedVerses].map(Number).sort((a,b)=>a-b)[0];
         if(window.innerWidth>=900){openInlineEditor(S.book,S.chapter,v);}
         else{openNoteModal(S.book,S.chapter,v);}
+      }
+      if(e.key==='c'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+        e.preventDefault();
+        document.getElementById('vabCopy').click();
+      }
+      if(e.key==='s'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+        e.preventDefault();
+        document.getElementById('vabBookmark').click();
       }
     }
   });
@@ -2241,6 +2254,7 @@ function saveInlineNote(wrap, book, ch, v) {
   else { delete NOTES[noteKey(book, ch, v)]; }
   notesSave();
   closeInlineEditor(true);
+  if (typeof clearSelection === 'function') clearSelection();
   refreshNoteIndicators();
   renderMarginNotes();
 }
@@ -2290,11 +2304,10 @@ document.getElementById('nmSave').addEventListener('click', () => {
   const {book, ch, v} = _noteVerse;
   const text = document.getElementById('noteTextarea').value.trim();
   if (text) { NOTES[noteKey(book, ch, v)] = text; } else { delete NOTES[noteKey(book, ch, v)]; }
-  notesSave(); refreshNoteIndicators(); renderMarginNotes(); closeNoteModal();
+  notesSave(); refreshNoteIndicators(); renderMarginNotes();
+  if (typeof clearSelection === 'function') clearSelection();
+  closeNoteModal();
 });
-document.getElementById('nmDelete').addEventListener('click', () => {
-  if (!_noteVerse) return;
-  delete NOTES[noteKey(_noteVerse.book, _noteVerse.ch, _noteVerse.v)];
   notesSave(); refreshNoteIndicators(); renderMarginNotes(); closeNoteModal();
 });
 document.getElementById('nmCancel').addEventListener('click', closeNoteModal);
