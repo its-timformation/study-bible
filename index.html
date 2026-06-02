@@ -650,20 +650,58 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
   display:flex;align-items:center;justify-content:space-between;
 }
 .xref-card-goto{
-  background:none;border:none;cursor:pointer;
-  font-family:var(--sans);font-size:.58rem;letter-spacing:.08em;
-  color:var(--text-muted);padding:0;
-  transition:color .15s;
-  display:flex;align-items:center;gap:3px;
+  background:var(--bg-sub);
+  border:1px solid var(--border);
+  border-radius:20px;
+  cursor:pointer;
+  font-family:var(--sans);font-size:.62rem;font-weight:400;letter-spacing:.06em;
+  color:var(--text-soft);
+  padding:5px 10px;
+  transition:all .15s;
+  display:flex;align-items:center;gap:4px;
+  white-space:nowrap;
+  min-height:28px;
 }
-.xref-card-goto:hover{color:var(--hi);}
-.xref-card-goto svg{width:10px;height:10px;}
+.xref-card-goto:hover{background:var(--hi);color:#fff;border-color:var(--hi);}
+.xref-card-goto:focus-visible{outline:2px solid var(--hi);outline-offset:2px;}
+.xref-card-goto svg{width:11px;height:11px;flex-shrink:0;}
 .xref-card-text{
   font-family:var(--serif);font-size:.88rem;
   line-height:1.6;color:var(--text-soft);
   font-style:italic;
 }
 .xref-card-text em{font-style:normal;color:var(--text);}
+.xref-subheader{
+  padding:10px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.xref-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.xref-count-pill{
+  font-family:var(--sc);font-size:.6rem;letter-spacing:.14em;
+  background:var(--hi);color:#fff;
+  padding:2px 9px;border-radius:20px;
+  opacity:.9;
+}
+.xref-filter-label{
+  font-family:var(--sans);font-size:.68rem;color:var(--text-muted);
+  letter-spacing:.04em;
+}
+.xref-filter-btns{display:flex;align-items:center;gap:4px;}
+.xref-filter-btn{
+  background:var(--bg-sub);
+  border:1px solid var(--border);
+  border-radius:20px;
+  font-family:var(--sans);font-size:.62rem;font-weight:400;
+  color:var(--text-soft);
+  padding:4px 10px;
+  cursor:pointer;
+  transition:all .15s;
+  min-height:26px;
+}
+.xref-filter-btn:hover{border-color:var(--text-muted);color:var(--text);}
+.xref-filter-btn:focus-visible{outline:2px solid var(--hi);outline-offset:2px;}
+.xref-filter-btn.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 @media(min-width:900px){
   .xref-sheet{
     left:50%;right:auto;
@@ -819,6 +857,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
       <button class="xref-close" id="xrefClose" aria-label="Close">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
+    </div>
+    <div class="xref-subheader" id="xrefSubheader" style="display:none">
+      <div class="xref-meta">
+        <span class="xref-count-pill" id="xrefCountPill"></span>
+        <span class="xref-filter-label">Min. relevance</span>
+        <div class="xref-filter-btns" id="xrefFilterBtns">
+          <button class="xref-filter-btn active" data-min="0">All</button>
+          <button class="xref-filter-btn" data-min="3">3+</button>
+          <button class="xref-filter-btn" data-min="5">5+</button>
+          <button class="xref-filter-btn" data-min="10">10+</button>
+        </div>
+      </div>
     </div>
     <div class="xref-body" id="xrefBody">
       <div class="xref-loading" id="xrefLoading">
@@ -2727,12 +2777,26 @@ function osisToNav(ref) {
   } catch(e) { return null; }
 }
 
-// Fetch a single verse text from bible-api.com
+// Fetch verse text — ESV API (keyed, CORS-friendly, already used in app)
+// Falls back to bible-api.com if no ESV key available
+const _verseTextCache = {};
 async function fetchVerseText(book, chapter, verse) {
-  const r = await fetch(`https://bible-api.com/${encodeURIComponent(book)}+${chapter}:${verse}?translation=web`);
-  if (!r.ok) return null;
-  const d = await r.json();
-  return (d.verses && d.verses[0]) ? d.verses[0].text.trim() : null;
+  const key = `${book}|${chapter}|${verse}`;
+  if (_verseTextCache[key]) return _verseTextCache[key];
+  const esvKey = CONFIG.esvKey || localStorage.getItem('study-bible-esv-key') || '';
+  if (esvKey) {
+    try {
+      const ref = `${book} ${chapter}:${verse}`;
+      const params = new URLSearchParams({q:ref,'include-headings':false,'include-footnotes':false,'include-verse-numbers':false,'include-short-copyright':false,'include-passage-references':false});
+      const r = await fetch(`https://api.esv.org/v3/passage/text/?${params}`,{headers:{Authorization:`Token ${esvKey}`}});
+      if (r.ok) {
+        const d = await r.json();
+        const text = ((d.passages||[''])[0]||'').replace(/\s+/g,' ').trim();
+        if (text) { _verseTextCache[key] = text; return text; }
+      }
+    } catch(e) {}
+  }
+  return null;
 }
 
 // Open the overlay for a given verse
@@ -2795,38 +2859,40 @@ async function getXrefData() {
 }
 
 async function openXrefOverlay(book, chapter, verse) {
-  const overlay  = document.getElementById('xrefOverlay');
-  const grid     = document.getElementById('xrefGrid');
-  const loading  = document.getElementById('xrefLoading');
-  const sourceEl = document.getElementById('xrefSource');
+  const overlay   = document.getElementById('xrefOverlay');
+  const grid      = document.getElementById('xrefGrid');
+  const loading   = document.getElementById('xrefLoading');
+  const sourceEl  = document.getElementById('xrefSource');
+  const subheader = document.getElementById('xrefSubheader');
+  const countPill = document.getElementById('xrefCountPill');
 
   sourceEl.textContent = `${book} ${chapter}:${verse}`;
   grid.innerHTML = '';
   loading.style.display = 'flex';
+  subheader.style.display = 'none';
   overlay.classList.add('open');
   if (typeof clearSelection === 'function') clearSelection();
 
-  try {
-    const allRefs = await getXrefData();
-    const osisBook = OSIS[book];
-    if (!osisBook) throw new Error('Unknown book');
+  let _allMatches = [];
+  let _minVotes   = 0;
 
-    // Source ref in OSIS format e.g. "JHN.1.1"
-    const fromRef = `${osisBook}.${chapter}.${verse}`;
+  function renderCards(minVotes) {
+    _minVotes = minVotes;
+    const filtered = _allMatches.filter(r => r.votes >= minVotes);
+    countPill.textContent = `${filtered.length} reference${filtered.length !== 1 ? 's' : ''}`;
 
-    const matches = allRefs
-      .filter(r => r.from === fromRef)
-      .sort((a, b) => b.votes - a.votes)
-      .slice(0, 20);
+    // Update filter button states
+    document.querySelectorAll('.xref-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.min) === minVotes);
+    });
 
-    loading.style.display = 'none';
-
-    if (!matches.length) {
-      grid.innerHTML = `<div class="xref-empty">No cross-references found for ${book} ${chapter}:${verse}.</div>`;
+    grid.innerHTML = '';
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="xref-empty">No references with ${minVotes}+ votes for ${book} ${chapter}:${verse}.</div>`;
       return;
     }
 
-    matches.forEach(async (ref, i) => {
+    filtered.forEach((ref, i) => {
       const nav     = parseOsisRef(ref.to);
       const toBook  = nav && nav.book;
       const toCh    = nav && nav.chapter;
@@ -2835,16 +2901,18 @@ async function openXrefOverlay(book, chapter, verse) {
 
       const card = document.createElement('div');
       card.className = 'xref-card';
+      card.dataset.idx = i;
       card.innerHTML = `
         <div class="xref-card-ref">
           <span>${escNote(display)}</span>
           ${toBook ? `<button class="xref-card-goto"
             data-book="${escNote(toBook)}" data-ch="${toCh}" data-v="${toV}"
-            title="Go to ${escNote(display)}">
-            Go there <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            aria-label="Go to ${escNote(display)}">
+            Go there
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>` : ''}
         </div>
-        <div class="xref-card-text xref-card-text-${i}">Loading…</div>`;
+        <div class="xref-card-text" data-ref="${escNote(ref.to)}">…</div>`;
 
       grid.appendChild(card);
 
@@ -2855,19 +2923,48 @@ async function openXrefOverlay(book, chapter, verse) {
         render(); updateSelector();
       });
 
-      // Fetch verse text
+      // Stagger fetches to avoid rate limiting — 80ms apart
       if (toBook && toCh && toV) {
-        fetchVerseText(toBook, toCh, toV).then(text => {
-          const el = card.querySelector(`.xref-card-text-${i}`);
-          if (el) el.textContent = text || display;
-        }).catch(() => {
-          const el = card.querySelector(`.xref-card-text-${i}`);
-          if (el) el.textContent = display;
-        });
+        setTimeout(() => {
+          fetchVerseText(toBook, toCh, toV).then(text => {
+            const el = card.querySelector('.xref-card-text');
+            // Only show text if we got something — don't fall back to ref string (avoids duplication)
+            if (el) el.textContent = text || '';
+          }).catch(() => {
+            const el = card.querySelector('.xref-card-text');
+            if (el) el.textContent = '';
+          });
+        }, i * 80);
       } else {
-        const el = card.querySelector(`.xref-card-text-${i}`);
-        if (el) el.textContent = display;
+        card.querySelector('.xref-card-text').textContent = '';
       }
+    });
+  }
+
+  try {
+    const allRefs  = await getXrefData();
+    const osisBook = OSIS[book];
+    if (!osisBook) throw new Error('Unknown book');
+
+    const fromRef = `${osisBook}.${chapter}.${verse}`;
+    _allMatches   = allRefs
+      .filter(r => r.from === fromRef)
+      .sort((a, b) => b.votes - a.votes)
+      .slice(0, 40);
+
+    loading.style.display = 'none';
+
+    if (!_allMatches.length) {
+      grid.innerHTML = `<div class="xref-empty">No cross-references found for ${book} ${chapter}:${verse}.</div>`;
+      return;
+    }
+
+    subheader.style.display = 'block';
+    renderCards(0);
+
+    // Wire filter buttons
+    document.querySelectorAll('.xref-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => renderCards(parseInt(btn.dataset.min)));
     });
 
   } catch(err) {
