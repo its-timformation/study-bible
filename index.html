@@ -2763,8 +2763,8 @@ async function getXrefData() {
     return new Promise(resolve => _xrefCallbacks.push(resolve));
   }
   _xrefLoading = true;
-  // scrollmapper bible_databases via jsDelivr CDN — CORS-friendly
-  const url = 'https://cdn.jsdelivr.net/gh/scrollmapper/bible_databases@master/json/cross_references.json';
+  // Self-hosted cross-reference dataset (committed to repo, served by Cloudflare Pages)
+  const url = '/cross_references.json';
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Failed to load cross-reference data (${r.status})`);
   const raw = await r.json();
