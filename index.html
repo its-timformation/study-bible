@@ -524,14 +524,70 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 
 .mnote-editor-hint{font-family:var(--sans);font-size:.56rem;color:var(--text-muted);letter-spacing:.04em;margin-top:5px;opacity:.7;}
 .mnote-editor-hint kbd{font-family:var(--sans);background:var(--bg-sub);border:1px solid var(--border);border-radius:3px;padding:0 3px;font-size:.55rem;}
-.mnote-editor-actions{display:flex;align-items:center;gap:8px;margin-top:7px;padding-top:5px;border-top:1px solid var(--border);}
-.mne-save{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--note-color);cursor:pointer;padding:4px 0;transition:opacity .15s;}
-.mne-save:hover{opacity:.65;}
-.mne-cancel{background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;padding:4px 0;transition:color .15s;}
-.mne-cancel:hover{color:var(--text);}
-.mne-delete{margin-left:auto;background:none;border:none;font-family:var(--sans);font-size:.6rem;font-weight:300;letter-spacing:.1em;color:var(--text-muted);cursor:pointer;padding:4px 0;transition:color .15s;opacity:.55;}
-.mne-delete:hover{color:#964040;opacity:1;}
-/* ── Note group (multiple notes per verse) ── */
+.xref-card-actions{
+  display:flex;align-items:center;gap:6px;
+  margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--border-light, var(--border));
+  flex-wrap:wrap;
+}
+.xref-card-goto,
+.xref-card-copy,
+.xref-card-note{
+  display:inline-flex;align-items:center;gap:5px;
+  height:30px;padding:0 12px;
+  border-radius:20px;
+  font-family:var(--sans);font-size:.68rem;font-weight:400;letter-spacing:.04em;
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.xref-card-goto{
+  background:var(--text);color:var(--bg);border:1px solid var(--text);
+}
+.xref-card-goto:hover{opacity:.8;}
+.xref-card-goto:focus-visible{outline:2px solid var(--hi);outline-offset:2px;}
+.xref-card-goto svg{width:12px;height:12px;flex-shrink:0;}
+.xref-card-copy,
+.xref-card-note{
+  background:var(--bg-sub);color:var(--text-soft);border:1px solid var(--border);
+}
+.xref-card-copy:hover,.xref-card-note:hover{border-color:var(--text-muted);color:var(--text);}
+.xref-card-copy:focus-visible,.xref-card-note:focus-visible{outline:2px solid var(--hi);outline-offset:2px;}
+.xref-card-copy svg,.xref-card-note svg{width:12px;height:12px;flex-shrink:0;}
+
+/* ── Editor action buttons — proper accessible pill buttons ── */
+.mnote-editor-actions{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.mne-save{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:30px;padding:0 14px;
+  background:var(--note-color);color:#fff;
+  border:1px solid var(--note-color);border-radius:20px;
+  font-family:var(--sans);font-size:.68rem;font-weight:500;letter-spacing:.06em;
+  cursor:pointer;transition:opacity .15s;
+}
+.mne-save:hover{opacity:.82;}
+.mne-save:focus-visible{outline:2px solid var(--note-color);outline-offset:2px;}
+.mne-cancel{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:30px;padding:0 14px;
+  background:var(--bg-sub);color:var(--text-soft);
+  border:1px solid var(--border);border-radius:20px;
+  font-family:var(--sans);font-size:.68rem;font-weight:400;letter-spacing:.06em;
+  cursor:pointer;transition:all .15s;
+}
+.mne-cancel:hover{border-color:var(--text-muted);color:var(--text);}
+.mne-cancel:focus-visible{outline:2px solid var(--hi);outline-offset:2px;}
+.mne-delete{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:30px;padding:0 12px;
+  background:none;color:var(--text-muted);
+  border:1px solid var(--border);border-radius:20px;
+  font-family:var(--sans);font-size:.68rem;font-weight:400;letter-spacing:.06em;
+  cursor:pointer;transition:all .15s;
+  margin-left:auto;
+}
+.mne-delete:hover{color:#c0392b;border-color:#c0392b;}
+.mne-delete:focus-visible{outline:2px solid #c0392b;outline-offset:2px;}
 .mnote-group{display:flex;flex-direction:column;}
 .mnote-continuation-rule{height:1px;background:var(--border);margin:0 0 4px 12px;opacity:.5;}
 .mnote-ref-actions{display:flex;align-items:center;gap:6px;}
@@ -678,10 +734,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 }
 .xref-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .xref-count-pill{
-  font-family:var(--sc);font-size:.6rem;letter-spacing:.14em;
-  background:var(--hi);color:#fff;
-  padding:2px 9px;border-radius:20px;
-  opacity:.9;
+  font-family:var(--sans);font-size:.7rem;font-weight:600;letter-spacing:.02em;
+  background:var(--text);color:var(--bg);
+  padding:3px 10px;border-radius:20px;
+  min-width:28px;text-align:center;
 }
 .xref-filter-label{
   font-family:var(--sans);font-size:.68rem;color:var(--text-muted);
@@ -861,12 +917,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
     <div class="xref-subheader" id="xrefSubheader" style="display:none">
       <div class="xref-meta">
         <span class="xref-count-pill" id="xrefCountPill"></span>
-        <span class="xref-filter-label">Min. relevance</span>
+        <span class="xref-filter-label">Filter by votes</span>
         <div class="xref-filter-btns" id="xrefFilterBtns">
-          <button class="xref-filter-btn active" data-min="0">All</button>
-          <button class="xref-filter-btn" data-min="3">3+</button>
-          <button class="xref-filter-btn" data-min="5">5+</button>
-          <button class="xref-filter-btn" data-min="10">10+</button>
+          <button class="xref-filter-btn active" data-min="0">Any</button>
+          <button class="xref-filter-btn" data-min="2">2+ votes</button>
+          <button class="xref-filter-btn" data-min="5">5+ votes</button>
+          <button class="xref-filter-btn" data-min="15">15+ votes</button>
+          <button class="xref-filter-btn" data-min="30">30+ votes</button>
         </div>
       </div>
     </div>
@@ -2460,7 +2517,7 @@ function escNote(s) {
 let _activeEditor = null;
 
 // noteId: null = new note, string = editing existing
-function openInlineEditor(book, ch, v, noteId) {
+function openInlineEditor(book, ch, v, noteId, prefill) {
   closeInlineEditor(false);
 
   const sorted = getChapterNotesSorted(book, ch);
@@ -2479,7 +2536,7 @@ function openInlineEditor(book, ch, v, noteId) {
   const key = noteKey(book, ch, v);
   const noteArr = NOTES[key] || [];
   const existingNote = noteId ? noteArr.find(n => n.id == noteId) : null;
-  const existing = existingNote ? existingNote.html : '';
+  const existing = existingNote ? existingNote.html : (prefill ? `<p>${prefill}</p>` : '');
 
   const wrap = document.createElement('div');
   wrap.className = 'mnote-editor';
@@ -2905,14 +2962,24 @@ async function openXrefOverlay(book, chapter, verse) {
       card.innerHTML = `
         <div class="xref-card-ref">
           <span>${escNote(display)}</span>
+        </div>
+        <div class="xref-card-text" data-ref="${escNote(ref.to)}">…</div>
+        <div class="xref-card-actions">
           ${toBook ? `<button class="xref-card-goto"
             data-book="${escNote(toBook)}" data-ch="${toCh}" data-v="${toV}"
-            aria-label="Go to ${escNote(display)}">
-            Go there
+            aria-label="Navigate to ${escNote(display)}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Go there
           </button>` : ''}
-        </div>
-        <div class="xref-card-text" data-ref="${escNote(ref.to)}">…</div>`;
+          <button class="xref-card-copy" data-display="${escNote(display)}" aria-label="Copy ${escNote(display)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button class="xref-card-note" data-display="${escNote(display)}" aria-label="Add note for ${escNote(display)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8l6-6V4a2 2 0 0 0-2-2z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+            Add note
+          </button>
+        </div>`;
 
       grid.appendChild(card);
 
@@ -2921,6 +2988,27 @@ async function openXrefOverlay(book, chapter, verse) {
         S.book    = e.currentTarget.dataset.book;
         S.chapter = parseInt(e.currentTarget.dataset.ch);
         render(); updateSelector();
+      });
+
+      card.querySelector('.xref-card-copy')?.addEventListener('click', e => {
+        const txt = card.querySelector('.xref-card-text').textContent;
+        const ref = e.currentTarget.dataset.display;
+        navigator.clipboard.writeText(txt ? `${ref} — ${txt}` : ref).catch(()=>{});
+        const btn = e.currentTarget;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy'; }, 1500);
+      });
+
+      card.querySelector('.xref-card-note')?.addEventListener('click', e => {
+        const txt  = card.querySelector('.xref-card-text').textContent;
+        const ref  = e.currentTarget.dataset.display;
+        const note = txt ? `${ref} — ${txt}` : ref;
+        // Pre-fill the inline editor with the cross-reference
+        closeXrefOverlay();
+        const v = S.selectedVerses && S.selectedVerses.size > 0
+          ? Math.min(...[...S.selectedVerses].map(Number))
+          : verse;
+        openInlineEditor(S.book, S.chapter, v, null, note);
       });
 
       // Stagger fetches to avoid rate limiting — 80ms apart
