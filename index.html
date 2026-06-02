@@ -2727,19 +2727,6 @@ function osisToNav(ref) {
   } catch(e) { return null; }
 }
 
-// Fetch cross references from OpenBible.info
-async function fetchCrossRefs(book, chapter, verse) {
-  const osisBook = OSIS[book];
-  if (!osisBook) return [];
-  const ref = `${osisBook}.${chapter}.${verse}`;
-  const url = `https://www.cross-references.com/api/references?passage=${ref}&format=json`;
-  // Fallback: use labs.bible.org which has a simpler API
-  // Primary: OpenBible cross-reference data via their API
-  const r = await fetch(`https://www.openbible.info/labs/cross-references/search?q=${encodeURIComponent(`${book} ${chapter}:${verse}`)}&format=json`);
-  if (!r.ok) throw new Error('fetch failed');
-  return await r.json();
-}
-
 // Fetch a single verse text from bible-api.com
 async function fetchVerseText(book, chapter, verse) {
   const r = await fetch(`https://bible-api.com/${encodeURIComponent(book)}+${chapter}:${verse}?translation=web`);
@@ -2760,32 +2747,24 @@ async function openXrefOverlay(book, chapter, verse) {
   loading.style.display = 'flex';
   overlay.classList.add('open');
 
-  // Close action bar
   if (typeof clearSelection === 'function') clearSelection();
 
   try {
-    // OpenBible.info cross-reference API
     const osisBook = OSIS[book];
     if (!osisBook) throw new Error('Unknown book');
-    const ref = `${osisBook}.${chapter}.${verse}`;
 
-    // Try OpenBible JSON API
-    let refs = [];
-    try {
-      const r = await fetch(
-        `https://www.openbible.info/labs/cross-references/search?q=${encodeURIComponent(ref)}&format=json`,
-        { signal: AbortSignal.timeout(8000) }
-      );
-      if (r.ok) {
-        const data = await r.json();
-        refs = (Array.isArray(data) ? data : [])
-          .filter(d => d.tv && d.tv !== ref)
-          .sort((a,b) => (b.votes||0) - (a.votes||0))
-          .slice(0, 20);
-      }
-    } catch(fetchErr) {
-      // CORS or network failure — fall through to empty state
-    }
+    const verseId = `${osisBook}.${chapter}.${verse}`;
+    const bibleId = 'de4e12af7f28f599-01';
+    const apiKey  = CONFIG.apiBibleKey || localStorage.getItem('study-bible-apibible-key') || '';
+
+    const r = await fetch(
+      `https://rest.api.bible/v1/bibles/${bibleId}/verses/${verseId}/cross-references?limit=20`,
+      { headers: { 'api-key': apiKey } }
+    );
+
+    if (!r.ok) throw new Error(`API error ${r.status}`);
+    const data = await r.json();
+    const refs = (data.data || []).slice(0, 20);
 
     loading.style.display = 'none';
 
@@ -2794,10 +2773,10 @@ async function openXrefOverlay(book, chapter, verse) {
       return;
     }
 
-    // Render cards immediately with refs, then fill in verse text async
     refs.forEach(async (ref, i) => {
-      const nav = osisToNav(ref.tv);
-      const display = osisToDisplay(ref.tv);
+      const refId   = ref.id || '';
+      const nav     = osisToNav(refId);
+      const display = ref.reference || osisToDisplay(refId);
 
       const card = document.createElement('div');
       card.className = 'xref-card';
@@ -2812,18 +2791,14 @@ async function openXrefOverlay(book, chapter, verse) {
 
       grid.appendChild(card);
 
-      // Navigate on "Go there"
       card.querySelector('.xref-card-goto')?.addEventListener('click', e => {
-        const b = e.currentTarget.dataset.book;
+        const b  = e.currentTarget.dataset.book;
         const ch = parseInt(e.currentTarget.dataset.ch);
         closeXrefOverlay();
-        // Use the app's existing navigation
         S.book = b; S.chapter = ch;
-        render();
-        updateSelector();
+        render(); updateSelector();
       });
 
-      // Fetch verse text
       if (nav && nav.book && nav.chapter && nav.verse) {
         fetchVerseText(nav.book, nav.chapter, nav.verse).then(text => {
           const el = card.querySelector(`.xref-card-text-${i}`);
@@ -2839,10 +2814,9 @@ async function openXrefOverlay(book, chapter, verse) {
 
   } catch(err) {
     loading.style.display = 'none';
-    grid.innerHTML = `<div class="xref-empty">Could not load cross-references. Check your connection.</div>`;
+    grid.innerHTML = `<div class="xref-empty">Could not load cross-references — ${escNote(err.message)}.</div>`;
   }
 }
-
 function closeXrefOverlay() {
   document.getElementById('xrefOverlay').classList.remove('open');
 }
