@@ -384,7 +384,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
 @media(min-width:1100px){
   #studyLayout{
     display:grid;
-    grid-template-columns:1fr 560px 1fr;
+    grid-template-columns:1fr 680px 1fr;
     min-height:calc(100vh - 52px);
     width:100%;
     box-sizing:border-box;
@@ -910,21 +910,27 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--serif);font-s
         <h2 class="xref-title" id="xrefTitle">Cross-references</h2>
         <span class="xref-source" id="xrefSource"></span>
       </div>
-      <button class="xref-close" id="xrefClose" aria-label="Close">
+      <button class="xref-close" id="xrefClose" aria-label="Close panel">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
+    <!-- Source passage block -->
+    <div class="xref-passage" id="xrefPassage" style="display:none">
+      <div class="xref-passage-ref" id="xrefPassageRef"></div>
+      <div class="xref-passage-text" id="xrefPassageText"></div>
+    </div>
+    <!-- Filters -->
     <div class="xref-subheader" id="xrefSubheader" style="display:none">
       <div class="xref-meta">
         <span class="xref-count-pill" id="xrefCountPill"></span>
-        <span class="xref-filter-label">Filter by votes</span>
-        <div class="xref-filter-btns" id="xrefFilterBtns">
-          <button class="xref-filter-btn active" data-min="0">Any</button>
-          <button class="xref-filter-btn" data-min="2">2+ votes</button>
-          <button class="xref-filter-btn" data-min="5">5+ votes</button>
-          <button class="xref-filter-btn" data-min="15">15+ votes</button>
-          <button class="xref-filter-btn" data-min="30">30+ votes</button>
+        <div class="xref-filter-btns" id="xrefFilterBtns" role="group" aria-label="Filter by testament">
+          <button class="xref-filter-btn active" data-testament="all">All</button>
+          <button class="xref-filter-btn" data-testament="ot">Old Testament</button>
+          <button class="xref-filter-btn" data-testament="nt">New Testament</button>
         </div>
+        <select class="xref-book-select" id="xrefBookSelect" aria-label="Filter by book">
+          <option value="">All books</option>
+        </select>
       </div>
     </div>
     <div class="xref-body" id="xrefBody">
@@ -1798,7 +1804,7 @@ function buildFilterChips(items){
   
   // OT/NT counts
   const OT_BOOKS=new Set(['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi']);
-  const otCount=items.filter(it=>OT_BOOKS.has(getBookFromRef(it.ref||''))).length;
+  const otCount=items.filter(it=>XREF_OT_BOOKS.has(getBookFromRef(it.ref||''))).length;
   const ntCount=items.length-otCount;
   
   let html=`<button class="sf-chip${searchActiveFilter==='all'?' active':''}" data-filter="all">All (${items.length})</button>`;
@@ -1827,8 +1833,8 @@ function buildFilterChips(items){
 function getFilteredItems(){
   const OT_BOOKS=new Set(['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi']);
   if(searchActiveFilter==='all')return searchAllItems;
-  if(searchActiveFilter==='OT')return searchAllItems.filter(it=>OT_BOOKS.has(getBookFromRef(it.ref||'')));
-  if(searchActiveFilter==='NT')return searchAllItems.filter(it=>!OT_BOOKS.has(getBookFromRef(it.ref||'')));
+  if(searchActiveFilter==='OT')return searchAllItems.filter(it=>XREF_OT_BOOKS.has(getBookFromRef(it.ref||'')));
+  if(searchActiveFilter==='NT')return searchAllItems.filter(it=>!XREF_OT_BOOKS.has(getBookFromRef(it.ref||'')));
   return searchAllItems.filter(it=>getBookFromRef(it.ref||'')===searchActiveFilter);
 }
 
@@ -2915,41 +2921,54 @@ async function getXrefData() {
   return _xrefData;
 }
 
-async function openXrefOverlay(book, chapter, verse) {
-  const overlay   = document.getElementById('xrefOverlay');
-  const grid      = document.getElementById('xrefGrid');
-  const loading   = document.getElementById('xrefLoading');
-  const sourceEl  = document.getElementById('xrefSource');
-  const subheader = document.getElementById('xrefSubheader');
-  const countPill = document.getElementById('xrefCountPill');
+// OT books
+const XREF_OT_BOOKS = new Set(['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi']);
 
-  sourceEl.textContent = `${book} ${chapter}:${verse}`;
+async function openXrefOverlay(book, chapter, verse) {
+  const overlay     = document.getElementById('xrefOverlay');
+  const grid        = document.getElementById('xrefGrid');
+  const loading     = document.getElementById('xrefLoading');
+  const sourceEl    = document.getElementById('xrefSource');
+  const subheader   = document.getElementById('xrefSubheader');
+  const countPill   = document.getElementById('xrefCountPill');
+  const passageEl   = document.getElementById('xrefPassage');
+  const passageRef  = document.getElementById('xrefPassageRef');
+  const passageText = document.getElementById('xrefPassageText');
+  const bookSelect  = document.getElementById('xrefBookSelect');
+
+  sourceEl.textContent   = `${book} ${chapter}:${verse}`;
+  passageRef.textContent = `${book} ${chapter}:${verse}`;
+  passageText.textContent = '';
+  passageEl.style.display  = 'block';
   grid.innerHTML = '';
   loading.style.display = 'flex';
   subheader.style.display = 'none';
   overlay.classList.add('open');
   if (typeof clearSelection === 'function') clearSelection();
 
+  // Fetch source passage immediately
+  fetchVerseText(book, chapter, verse).then(t => { if (t) passageText.textContent = t; }).catch(()=>{});
+
   let _allMatches = [];
-  let _minVotes   = 0;
+  let _testament  = 'all';
+  let _bookFilter = '';
 
-  function renderCards(minVotes) {
-    _minVotes = minVotes;
-    const filtered = _allMatches.filter(r => r.votes >= minVotes);
-    countPill.textContent = `${filtered.length} reference${filtered.length !== 1 ? 's' : ''}`;
+  function applyFilters() {
+    let f = _allMatches;
+    if (_testament === 'ot') f = f.filter(r => { const n = parseOsisRef(r.to); return n && XREF_OT_BOOKS.has(n.book); });
+    if (_testament === 'nt') f = f.filter(r => { const n = parseOsisRef(r.to); return n && !XREF_OT_BOOKS.has(n.book); });
+    if (_bookFilter) f = f.filter(r => { const n = parseOsisRef(r.to); return n && n.book === _bookFilter; });
+    countPill.textContent = `${f.length} reference${f.length !== 1 ? 's' : ''}`;
+    renderCards(f);
+  }
 
-    // Update filter button states
-    document.querySelectorAll('.xref-filter-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.dataset.min) === minVotes);
-    });
-
+  function renderCards(matches) {
     grid.innerHTML = '';
-    if (!filtered.length) {
-      grid.innerHTML = `<div class="xref-empty">No references with ${minVotes}+ votes for ${book} ${chapter}:${verse}.</div>`;
+    if (!matches.length) {
+      grid.innerHTML = `<div class="xref-empty">No references match this filter.</div>`;
       return;
     }
-
-    filtered.forEach((ref, i) => {
+    matches.forEach((ref, i) => {
       const nav     = parseOsisRef(ref.to);
       const toBook  = nav && nav.book;
       const toCh    = nav && nav.chapter;
@@ -2958,73 +2977,51 @@ async function openXrefOverlay(book, chapter, verse) {
 
       const card = document.createElement('div');
       card.className = 'xref-card';
-      card.dataset.idx = i;
       card.innerHTML = `
-        <div class="xref-card-ref">
-          <span>${escNote(display)}</span>
-        </div>
-        <div class="xref-card-text" data-ref="${escNote(ref.to)}">…</div>
+        <div class="xref-card-ref">${escNote(display)}</div>
+        <div class="xref-card-text"></div>
         <div class="xref-card-actions">
-          ${toBook ? `<button class="xref-card-goto"
-            data-book="${escNote(toBook)}" data-ch="${toCh}" data-v="${toV}"
-            aria-label="Navigate to ${escNote(display)}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            Go there
-          </button>` : ''}
+          ${toBook ? `<button class="xref-card-goto" data-book="${escNote(toBook)}" data-ch="${toCh}" data-v="${toV}" aria-label="Go to ${escNote(display)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Go there</button>` : ''}
           <button class="xref-card-copy" data-display="${escNote(display)}" aria-label="Copy ${escNote(display)}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
           <button class="xref-card-note" data-display="${escNote(display)}" aria-label="Add note for ${escNote(display)}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8l6-6V4a2 2 0 0 0-2-2z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
-            Add note
-          </button>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8l6-6V4a2 2 0 0 0-2-2z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Add note</button>
         </div>`;
 
       grid.appendChild(card);
 
       card.querySelector('.xref-card-goto')?.addEventListener('click', e => {
         closeXrefOverlay();
-        S.book    = e.currentTarget.dataset.book;
+        S.book = e.currentTarget.dataset.book;
         S.chapter = parseInt(e.currentTarget.dataset.ch);
         render(); updateSelector();
       });
 
       card.querySelector('.xref-card-copy')?.addEventListener('click', e => {
-        const txt = card.querySelector('.xref-card-text').textContent;
-        const ref = e.currentTarget.dataset.display;
-        navigator.clipboard.writeText(txt ? `${ref} — ${txt}` : ref).catch(()=>{});
-        const btn = e.currentTarget;
+        const txt = card.querySelector('.xref-card-text').textContent.trim();
+        const lbl = e.currentTarget.dataset.display;
+        navigator.clipboard.writeText(txt ? `${lbl} — ${txt}` : lbl).catch(()=>{});
+        const btn = e.currentTarget; const orig = btn.innerHTML;
         btn.textContent = 'Copied!';
-        setTimeout(() => { btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy'; }, 1500);
+        setTimeout(() => { btn.innerHTML = orig; }, 1500);
       });
 
       card.querySelector('.xref-card-note')?.addEventListener('click', e => {
-        const txt  = card.querySelector('.xref-card-text').textContent;
-        const ref  = e.currentTarget.dataset.display;
-        const note = txt ? `${ref} — ${txt}` : ref;
-        // Pre-fill the inline editor with the cross-reference
+        const txt  = card.querySelector('.xref-card-text').textContent.trim();
+        const lbl  = e.currentTarget.dataset.display;
         closeXrefOverlay();
-        const v = S.selectedVerses && S.selectedVerses.size > 0
-          ? Math.min(...[...S.selectedVerses].map(Number))
-          : verse;
-        openInlineEditor(S.book, S.chapter, v, null, note);
+        const v = S.selectedVerses && S.selectedVerses.size > 0 ? Math.min(...[...S.selectedVerses].map(Number)) : verse;
+        openInlineEditor(S.book, S.chapter, v, null, txt ? `${lbl} — ${txt}` : lbl);
       });
 
-      // Stagger fetches to avoid rate limiting — 80ms apart
       if (toBook && toCh && toV) {
         setTimeout(() => {
-          fetchVerseText(toBook, toCh, toV).then(text => {
+          fetchVerseText(toBook, toCh, toV).then(t => {
             const el = card.querySelector('.xref-card-text');
-            // Only show text if we got something — don't fall back to ref string (avoids duplication)
-            if (el) el.textContent = text || '';
-          }).catch(() => {
-            const el = card.querySelector('.xref-card-text');
-            if (el) el.textContent = '';
-          });
+            if (el) el.textContent = t || '';
+          }).catch(() => { const el = card.querySelector('.xref-card-text'); if (el) el.textContent = ''; });
         }, i * 80);
-      } else {
-        card.querySelector('.xref-card-text').textContent = '';
       }
     });
   }
@@ -3034,11 +3031,10 @@ async function openXrefOverlay(book, chapter, verse) {
     const osisBook = OSIS[book];
     if (!osisBook) throw new Error('Unknown book');
 
-    const fromRef = `${osisBook}.${chapter}.${verse}`;
-    _allMatches   = allRefs
-      .filter(r => r.from === fromRef)
+    _allMatches = allRefs
+      .filter(r => r.from === `${osisBook}.${chapter}.${verse}`)
       .sort((a, b) => b.votes - a.votes)
-      .slice(0, 40);
+      .slice(0, 60);
 
     loading.style.display = 'none';
 
@@ -3047,17 +3043,29 @@ async function openXrefOverlay(book, chapter, verse) {
       return;
     }
 
-    subheader.style.display = 'block';
-    renderCards(0);
+    // Populate book dropdown
+    const booksInResults = [...new Set(_allMatches.map(r => parseOsisRef(r.to)?.book).filter(Boolean))].sort();
+    bookSelect.innerHTML = '<option value="">All books</option>' +
+      booksInResults.map(b => `<option value="${escNote(b)}">${escNote(b)}</option>`).join('');
 
-    // Wire filter buttons
+    subheader.style.display = 'block';
+    applyFilters();
+
+    // Wire filters — clone to remove stale listeners
     document.querySelectorAll('.xref-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => renderCards(parseInt(btn.dataset.min)));
+      const nb = btn.cloneNode(true);
+      btn.parentNode.replaceChild(nb, btn);
+      nb.addEventListener('click', () => {
+        _testament = nb.dataset.testament; _bookFilter = ''; bookSelect.value = '';
+        document.querySelectorAll('.xref-filter-btn').forEach(b => b.classList.toggle('active', b === nb));
+        applyFilters();
+      });
     });
+    bookSelect.onchange = () => { _bookFilter = bookSelect.value; applyFilters(); };
 
   } catch(err) {
     loading.style.display = 'none';
-    grid.innerHTML = `<div class="xref-empty">Could not load cross-references — ${escNote(err.message)}.</div>`;
+    grid.innerHTML = `<div class="xref-empty">Could not load — ${escNote(err.message)}.</div>`;
   }
 }
 
