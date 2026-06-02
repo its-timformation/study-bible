@@ -2757,27 +2757,42 @@ let _xrefData = null;
 let _xrefLoading = false;
 let _xrefCallbacks = [];
 
+// OSIS book code → book name (e.g. "JHN" → "John")
+const OSIS_TO_BOOK = Object.fromEntries(Object.entries(OSIS).map(([name, code]) => [code, name]));
+
+// Parse OSIS ref string "JHN.1.1" → {book, chapter, verse}
+function parseOsisRef(ref) {
+  const parts = ref.split('.');
+  const book  = OSIS_TO_BOOK[parts[0]];
+  return book ? { book, chapter: parseInt(parts[1]), verse: parseInt(parts[2]) } : null;
+}
+
 async function getXrefData() {
   if (_xrefData) return _xrefData;
   if (_xrefLoading) {
     return new Promise(resolve => _xrefCallbacks.push(resolve));
   }
   _xrefLoading = true;
-  // Self-hosted cross-reference dataset (committed to repo, served by Cloudflare Pages)
-  const url = '/cross_references.json';
-  const r = await fetch(url);
+  const r = await fetch('/cross_references.txt');
   if (!r.ok) throw new Error(`Failed to load cross-reference data (${r.status})`);
-  const raw = await r.json();
-  // raw is {cross_references: [{from:{book_id,chapter,verse}, to:{book_id,chapter,verse,end_verse}, votes}]}
-  _xrefData = raw.cross_references || raw;
+  const text = await r.text();
+
+  // Parse TSV: From\tTo\tVotes  (header line starts with "From Verse")
+  const lines = text.split('\n');
+  const refs  = [];
+  for (const line of lines) {
+    if (!line.trim() || line.startsWith('#') || line.startsWith('From')) continue;
+    const [from, to, votes] = line.trim().split('\t');
+    if (!from || !to) continue;
+    refs.push({ from, to, votes: parseInt(votes) || 0 });
+  }
+
+  _xrefData = refs;
   _xrefLoading = false;
   _xrefCallbacks.forEach(cb => cb(_xrefData));
   _xrefCallbacks = [];
   return _xrefData;
 }
-
-// scrollmapper uses numeric book IDs (1-66), same as our BOOK_NUM
-const _xrefBookById = Object.fromEntries(Object.entries(BOOK_NUM).map(([name,id])=>[id,name]));
 
 async function openXrefOverlay(book, chapter, verse) {
   const overlay  = document.getElementById('xrefOverlay');
@@ -2793,18 +2808,15 @@ async function openXrefOverlay(book, chapter, verse) {
 
   try {
     const allRefs = await getXrefData();
-    const fromId  = BOOK_NUM[book];
-    if (!fromId) throw new Error('Unknown book');
+    const osisBook = OSIS[book];
+    if (!osisBook) throw new Error('Unknown book');
 
-    // Filter refs for this verse, sort by votes desc, take top 20
+    // Source ref in OSIS format e.g. "JHN.1.1"
+    const fromRef = `${osisBook}.${chapter}.${verse}`;
+
     const matches = allRefs
-      .filter(r => {
-        const f = r.from || r;
-        return (f.book_id || f.book) === fromId &&
-               (f.chapter) === chapter &&
-               (f.verse) === verse;
-      })
-      .sort((a,b) => (b.votes||0) - (a.votes||0))
+      .filter(r => r.from === fromRef)
+      .sort((a, b) => b.votes - a.votes)
       .slice(0, 20);
 
     loading.style.display = 'none';
@@ -2815,14 +2827,11 @@ async function openXrefOverlay(book, chapter, verse) {
     }
 
     matches.forEach(async (ref, i) => {
-      const t       = ref.to || ref;
-      const toBook  = _xrefBookById[t.book_id || t.book];
-      const toCh    = t.chapter;
-      const toV     = t.verse_start || t.verse;
-      const toVEnd  = t.verse_end || t.end_verse || toV;
-      const display = toBook
-        ? (toVEnd && toVEnd !== toV ? `${toBook} ${toCh}:${toV}–${toVEnd}` : `${toBook} ${toCh}:${toV}`)
-        : '—';
+      const nav     = parseOsisRef(ref.to);
+      const toBook  = nav && nav.book;
+      const toCh    = nav && nav.chapter;
+      const toV     = nav && nav.verse;
+      const display = toBook ? `${toBook} ${toCh}:${toV}` : ref.to;
 
       const card = document.createElement('div');
       card.className = 'xref-card';
