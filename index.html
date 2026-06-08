@@ -1953,7 +1953,7 @@ async function doSearch(query){
           const ref=res.reference;
           if(seen.has(ref))return;
           seen.add(ref);
-          const text=(res.verses||[]).map(v=>v.text||v).join(' ').replace(/<[^>]+>/g,'')||res.passage||'';
+          const text=(res.content||'').replace(/<[^>]+>/g,'').trim();
           if(text)items.push({ref,text});
         });
       });
